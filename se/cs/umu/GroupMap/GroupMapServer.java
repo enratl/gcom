@@ -1,6 +1,8 @@
 package se.cs.umu.GroupMap;
 
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -11,7 +13,8 @@ public class GroupMapServer {
         try{
             GroupMapInterface groupMap = new GroupMap();
             Registry registry = LocateRegistry.createRegistry(1099);
-            Naming.rebind("GroupMap", groupMap);
+            Naming.rebind("//0.0.0.0/GroupMap", groupMap);
+
             System.out.println("Server READY boi");
 
         } catch (RemoteException | MalformedURLException e) {
