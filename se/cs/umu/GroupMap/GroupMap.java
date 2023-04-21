@@ -21,25 +21,25 @@ public class GroupMap extends UnicastRemoteObject implements GroupMapInterface {
         ArrayList<String> members = new ArrayList<>();
 
         for (String member : groups.get(groupName)) {
-            members.add(member + '/' + addresses.get(member));
+            members.add(addresses.get(member) + '/' + member);
         }
 
         return members;
     }
 
     @Override
-    public void addGroupMember(String groupName, String memberName, String adr) {
+    public void addGroupMember(String groupName, String memberName, String adr) throws RemoteException {
         groups.get(groupName).add(memberName);
         addresses.put(memberName, adr);
     }
 
     @Override
-    public void updateAdr(String memberName, String adr) {
+    public void updateAdr(String memberName, String adr) throws RemoteException {
         addresses.replace(memberName, adr);
     }
 
     @Override
-    public boolean createGroup(String groupName) {
+    public boolean createGroup(String groupName) throws RemoteException {
         if (groups.containsKey(groupName)) {
             return false;
         }
@@ -49,14 +49,12 @@ public class GroupMap extends UnicastRemoteObject implements GroupMapInterface {
     }
 
     @Override
-    public boolean userExists(String userName) {
+    public boolean userExists(String userName) throws RemoteException {
         return addresses.containsKey(userName);
     }
 
     @Override
-    public void removeFromGroup(String groupName, String userName) {
+    public void removeFromGroup(String groupName, String userName) throws RemoteException {
         groups.get(groupName).remove(userName);
     }
-
-
 }

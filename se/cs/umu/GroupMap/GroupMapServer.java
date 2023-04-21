@@ -15,7 +15,7 @@ public class GroupMapServer {
             Registry registry = LocateRegistry.createRegistry(1099);
             Naming.rebind("//0.0.0.0/GroupMap", groupMap);
 
-            System.out.println("Server READY boi");
+            System.out.println("GroupMap server READY");
 
         } catch (RemoteException | MalformedURLException e) {
             e.printStackTrace();

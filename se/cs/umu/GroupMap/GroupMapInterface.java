@@ -7,13 +7,13 @@ import java.util.ArrayList;
 public interface GroupMapInterface extends Remote {
     ArrayList<String> getGroupMembers(String groupName) throws RemoteException;
 
-    void addGroupMember(String groupName, String memberName, String adr);
+    void addGroupMember(String groupName, String memberName, String adr) throws RemoteException;
 
-    void updateAdr(String memberName, String adr);
+    void updateAdr(String memberName, String adr) throws RemoteException;
 
-    boolean createGroup(String groupName);
+    boolean createGroup(String groupName) throws RemoteException;
 
-    boolean userExists(String userName);
+    boolean userExists(String userName) throws RemoteException;
 
-    void removeFromGroup(String groupName, String userName);
+    void removeFromGroup(String groupName, String userName) throws RemoteException;
 }
