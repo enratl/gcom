@@ -1,36 +1,33 @@
 package se.cs.umu.test;
 
-import se.cs.umu.Communication.CommunicationInterface;
-import se.cs.umu.Communication.Communicator;
-import se.cs.umu.GroupMap.GroupMapInterface;
+import se.cs.umu.App.Debugger;
+import se.cs.umu.App.DebuggerController;
+import se.cs.umu.Communication.NodeCommunicationInterface;
 
-import javax.naming.Name;
-import java.net.MalformedURLException;
+import javax.swing.*;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class testClient {
     public static void main(String[] args) {
+        Debugger debugger = new Debugger();
+        debugger.buildGUI();
+        DebuggerController debuggerController = new DebuggerController(debugger);
+
+        debugger.displayGUI();
+
         try {
+
             //GroupMapInterface groupMap = (GroupMapInterface) Naming.lookup("rmi://localhost/GroupMap");
 
             //ArrayList<String> list = groupMap.hello();
             //System.out.println(list);
 
-            CommunicationInterface communication = (CommunicationInterface) Naming.lookup("rmi://localhost/Communication");
-            Communicator communicator = new Communicator(communication);
+            //communicator.send(communicators, "Ding dong");
+            //String response = communicator.receive();
+            //System.out.println("Received message: " + response);
 
-            ArrayList<CommunicationInterface> communicators = new ArrayList<>();
-            communicators.add(communication);
-
-            communicator.send(communicators, "Ding dong");
-            String response = communicator.receive();
-
-            System.out.println("Received message: " + response);
-
-        } catch (MalformedURLException | NotBoundException | RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
