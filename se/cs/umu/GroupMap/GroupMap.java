@@ -34,8 +34,8 @@ public class GroupMap extends UnicastRemoteObject implements GroupMapInterface {
     }
 
     @Override
-    public void updateAdr(String memberName, String adr) throws RemoteException {
-        addresses.replace(memberName, adr);
+    public void addAddress(String memberName, String adr) throws RemoteException {
+        addresses.put(memberName, adr);
     }
 
     @Override
@@ -56,5 +56,10 @@ public class GroupMap extends UnicastRemoteObject implements GroupMapInterface {
     @Override
     public void removeFromGroup(String groupName, String userName) throws RemoteException {
         groups.get(groupName).remove(userName);
+    }
+
+    @Override
+    public ArrayList<String> getGroups() throws RemoteException{
+        return new ArrayList<>(groups.keySet());
     }
 }

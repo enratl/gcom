@@ -9,15 +9,15 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class GroupMapServer {
-    public static void main(String[] args){
-        try{
+    public static void main(String[] args) {
+        try {
             GroupMapInterface groupMap = new GroupMap();
             Registry registry = LocateRegistry.createRegistry(1099);
             Naming.rebind("//0.0.0.0/GroupMap", groupMap);
 
-            System.out.println("GroupMap server READY");
+            System.out.println("Group map server running on: " + InetAddress.getLocalHost().getHostAddress());
 
-        } catch (RemoteException | MalformedURLException e) {
+        } catch (RemoteException | MalformedURLException | UnknownHostException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
