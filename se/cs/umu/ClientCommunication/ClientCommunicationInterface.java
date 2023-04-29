@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 public interface ClientCommunicationInterface extends Remote {
 
-    boolean startApplication(String userName) throws RemoteException;
     ArrayList<String> listGroups() throws RemoteException;
     ArrayList<String> getGroupMembers(String groupName) throws RemoteException;
     boolean joinGroup(String groupName) throws RemoteException;

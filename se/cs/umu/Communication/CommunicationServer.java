@@ -7,11 +7,11 @@ import java.rmi.registry.Registry;
 public class CommunicationServer {
     public static void main(String[] args) {
         try {
-            NodeCommunicationInterface communication = new NodeCommunication();
+            /*NodeCommunicationInterface communication = new NodeCommunication();
             Registry registry = LocateRegistry.createRegistry(1099);
             Naming.rebind("Communication", communication);
 
-            System.out.println("Server READY boi");
+            System.out.println("Server READY boi");*/
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

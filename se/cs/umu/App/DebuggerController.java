@@ -14,7 +14,7 @@ public class DebuggerController {
     NodeCommunication nodeCommunication;
     public DebuggerController(Debugger debugger) {
         try {
-            nodeCommunication = new NodeCommunication();
+            nodeCommunication = new NodeCommunication(null);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -36,7 +36,7 @@ public class DebuggerController {
 
             String message = debugger.getMessage();
 
-            nodeCommunication.sendToNodes(message, group);
+            //nodeCommunication.sendToNodes(message, group);
             System.out.println("Sent message: " + message);
         }
     }
