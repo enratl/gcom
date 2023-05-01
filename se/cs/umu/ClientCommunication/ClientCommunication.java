@@ -45,4 +45,19 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     public boolean sendMessageToGroup(String message, String groupName) throws RemoteException {
         return gcom.sendMessageToGroup(message, groupName);
     }
+
+    @Override
+    public void debugInterceptDelivery(boolean intercept){
+
+    }
+
+    @Override
+    public void debugReleaseIntercepted(){
+
+    }
+
+    @Override
+    public String debugGetVectorClocks(){
+        return "";
+    }
 }
