@@ -41,6 +41,26 @@ public class comtester {
                     String groupName = scanner.nextLine();
                     System.out.println(clientCom.getGroupMembers(groupName));
                 }
+                case "intercept" -> {
+                    clientCom.debugInterceptMessages(true);
+                    System.out.println("Now intercepting");
+                }
+                case "stopIntercept" -> {
+                    clientCom.debugInterceptMessages(false);
+                    System.out.println("Stopped intercepting");
+                }
+                case "releaseAllIntercepted" -> {
+                    clientCom.debugReleaseAllIntercepted();
+                    System.out.println("All intercepted messages released");
+                }
+                case "releaseNewestIntercepted" -> {
+                    clientCom.debugReleaseNewestIntercepted();
+                    System.out.println("Newest intercepted message released");
+                }
+                case "releaseOldestIntercepted" -> {
+                    clientCom.debugReleaseNewestIntercepted();
+                    System.out.println("Oldest intercepted message released");
+                }
             }
 
             input = scanner.nextLine();

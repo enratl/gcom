@@ -4,14 +4,18 @@ import se.cs.umu.GCom.GCom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
-public class CausalOrdering implements MessageOrdering{
+public class CausalOrdering implements MessageOrdering {
     private final ArrayList<BufferEntry> buffer;
     private final HashMap<String, Integer> vectorClock;
     private final GCom gcom;
     private final String groupName;
 
     private int clientClock;
+
+    private record BufferEntry(String sender, String message, HashMap<String, Integer> messageVectorClock) {
+    }
 
     public CausalOrdering(HashMap<String, Integer> vectorClock, String groupName, GCom gcom) {
         buffer = new ArrayList<>();
@@ -30,10 +34,19 @@ public class CausalOrdering implements MessageOrdering{
 
         if (messageIsReadyToDeliver(sender, messageVectorClock)) {
             deliverMessage(message, sender);
-            vectorClock.replaceAll((m, v) -> Math.max(vectorClock.get(m), messageVectorClock.getOrDefault(m,0)));
+            vectorClock.replaceAll((m, v) -> Math.max(vectorClock.get(m), messageVectorClock.getOrDefault(m, 0)));
 
             // Check if delivering this message made it possible to deliver any message in the buffer
-            buffer.removeIf(bufferEntry -> receiveMessage(bufferEntry.sender, bufferEntry.message, bufferEntry.messageVectorClock));
+            for (int i = buffer.size() - 1; i >= 0; i--) {
+                BufferEntry e = buffer.remove(i);
+                if(receiveMessage(e.sender, e.message, e.messageVectorClock)){
+                    break;
+                }
+                buffer.add(e);
+            }
+
+            // Check if delivering this message made it possible to deliver any message in the buffer
+            //buffer.removeIf(bufferEntry -> receiveMessage(bufferEntry.sender, bufferEntry.message, bufferEntry.messageVectorClock));
 
             return true;
         } else {
@@ -47,8 +60,17 @@ public class CausalOrdering implements MessageOrdering{
         return vectorClock;
     }
 
+    public String getBufferedMessages() {
+        StringBuilder sb = new StringBuilder();
+        for (BufferEntry e : buffer) {
+            sb.append(e.sender).append("\\").append(e.messageVectorClock).append(e.message).append("\n");
+        }
+
+        return sb.toString();
+    }
+
     private boolean messageIsReadyToDeliver(String sender, HashMap<String, Integer> messageVectorClock) {
-        if (sender.equals(gcom.getUsername()) && messageVectorClock.get(sender).equals(vectorClock.get(sender))){
+        if (sender.equals(gcom.getUsername()) && messageVectorClock.get(sender).equals(vectorClock.get(sender))) {
             // this is our own message
             return true;
         }
@@ -59,7 +81,7 @@ public class CausalOrdering implements MessageOrdering{
 
         for (String member : vectorClock.keySet()) {
 
-            if (!messageVectorClock.containsKey(member)){
+            if (!messageVectorClock.containsKey(member)) {
                 continue;
             }
 
@@ -76,6 +98,5 @@ public class CausalOrdering implements MessageOrdering{
         gcom.deliverMessage(message, groupName, sender, clientClock);
     }
 
-    private record BufferEntry(String sender, String message, HashMap<String, Integer> messageVectorClock) {
-    }
+
 }

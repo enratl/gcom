@@ -15,6 +15,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GCom {
 
@@ -22,16 +23,18 @@ public class GCom {
     private final GroupManagement groupManagement;
     private final ClientCommunication clientCommunication;
     private final NodeCommunication nodeCommunication;
-    private final HashMap<String, MessageOrdering> messageOrderings;
+    private final ConcurrentHashMap<String, MessageOrdering> messageOrderings;
+    private final Debugger debugger;
 
     public GCom(String username, String groupMapAddress) throws RemoteException, MalformedURLException, NotBoundException, UnknownHostException {
+        debugger = new Debugger();
         this.username = username;
 
         groupManagement = new GroupManagement(groupMapAddress);
         groupManagement.updateAddress(username, InetAddress.getLocalHost().getHostAddress());
         clientCommunication = new ClientCommunication(this);
         nodeCommunication = new NodeCommunication(this);
-        messageOrderings = new HashMap<>();
+        messageOrderings = new ConcurrentHashMap<>();
 
 
         Registry clientComRegistry = LocateRegistry.createRegistry(1100);
@@ -46,14 +49,14 @@ public class GCom {
     }
 
     public boolean joinGroup(String groupName) {
-        if (messageOrderings.containsKey(groupName)){
+        if (messageOrderings.containsKey(groupName)) {
             return true;
         }
 
         try {
             ArrayList<String> group = groupManagement.getGroupMembers(groupName);
             HashMap<String, Integer> vectorClock = nodeCommunication.initializeVectorClock(groupName, group);
-            messageOrderings.put(groupName, new CausalOrdering(vectorClock, groupName,this));
+            messageOrderings.put(groupName, new CausalOrdering(vectorClock, groupName, this));
             System.out.println(vectorClock);
             return groupManagement.joinGroup(groupName, username, InetAddress.getLocalHost().getHostAddress());
         } catch (UnknownHostException e) {
@@ -77,8 +80,8 @@ public class GCom {
         return username;
     }
 
-    public boolean sendMessageToGroup(String message, String groupName){
-        if (!messageOrderings.containsKey(groupName)){
+    public boolean sendMessageToGroup(String message, String groupName) {
+        if (!messageOrderings.containsKey(groupName)) {
             return false;
         }
 
@@ -89,18 +92,70 @@ public class GCom {
         return true;
     }
 
-    public void receiveMessage(String groupName, String sender, String message,HashMap<String, Integer> messageVectorClock){
+    public void receiveMessage(String groupName, String sender, String message, HashMap<String, Integer> messageVectorClock) {
         System.out.println("GCom received message: " + message);
-        messageOrderings.get(groupName).receiveMessage(sender, message, messageVectorClock);
+
+        if (debugger.shouldIntercept()) {
+            debugger.intercept(groupName, sender, message, messageVectorClock);
+        } else {
+            messageOrderings.get(groupName).receiveMessage(sender, message, messageVectorClock);
+        }
     }
 
-    public void deliverMessage(String message, String groupName, String sender, int clientClock){
+    public void deliverMessage(String message, String groupName, String sender, int clientClock) {
         // deliver to client
         System.out.println("GCom delivered [message: " + message + ", groupName: " + groupName + ", sender: " + sender
                 + ", clientClock: " + clientClock + "]");
     }
 
-    public HashMap<String, Integer> getVectorClock(String groupName){
+    public HashMap<String, Integer> getVectorClock(String groupName) {
         return messageOrderings.get(groupName).getVectorClock();
+    }
+
+    public void interceptMessages(boolean shouldIntercept) {
+        debugger.setShouldIntercept(shouldIntercept);
+    }
+
+    public void releaseAllIntercepted() {
+        for (DebugBufferEntry e : debugger.releaseAllIntercepted()) {
+            messageOrderings.get(e.groupName()).receiveMessage(e.sender(), e.message(), e.messageVectorClock());
+        }
+    }
+
+    public void releaseOldestIntercepted() {
+        DebugBufferEntry e = debugger.releaseOldestIntercepted();
+
+        if (e != null) {
+            messageOrderings.get(e.groupName()).receiveMessage(e.sender(), e.message(), e.messageVectorClock());
+        }
+    }
+
+    public void releaseNewestIntercepted() {
+        DebugBufferEntry e = debugger.releaseNewestIntercepted();
+
+        if (e != null) {
+            messageOrderings.get(e.groupName()).receiveMessage(e.sender(), e.message(), e.messageVectorClock());
+        }
+    }
+
+    public String getUndeliveredMessages() {
+        StringBuilder sb = new StringBuilder();
+
+        for (String group : messageOrderings.keySet()) {
+            sb.append(group).append("\n");
+            sb.append(messageOrderings.get(group).getBufferedMessages());
+        }
+
+        return sb.toString();
+    }
+
+    public String getVectorClocks() {
+        StringBuilder sb = new StringBuilder();
+
+        for (String group : messageOrderings.keySet()){
+            sb.append(group).append(" ").append(messageOrderings.get(group).getVectorClock());
+        }
+
+        return sb.toString();
     }
 }

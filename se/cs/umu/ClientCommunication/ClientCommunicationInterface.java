@@ -12,7 +12,10 @@ public interface ClientCommunicationInterface extends Remote {
     boolean leaveGroup(String groupName) throws RemoteException;
     boolean createGroup(String groupName) throws RemoteException;
     boolean sendMessageToGroup(String message, String groupName) throws RemoteException;
-    public void debugInterceptDelivery(boolean intercept);
-    public void debugReleaseIntercepted();
-    public String debugGetVectorClocks();
+    void debugInterceptMessages(boolean intercept) throws RemoteException;
+    void debugReleaseAllIntercepted() throws RemoteException;
+    void debugReleaseOldestIntercepted() throws RemoteException;
+    void debugReleaseNewestIntercepted() throws RemoteException;
+    String debugGetVectorClocks() throws RemoteException;
+    String debugGetUndeliveredMessages() throws RemoteException;
 }

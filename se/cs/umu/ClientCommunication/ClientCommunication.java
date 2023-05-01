@@ -47,17 +47,32 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     }
 
     @Override
-    public void debugInterceptDelivery(boolean intercept){
-
+    public void debugInterceptMessages(boolean shouldIntercept) throws RemoteException{
+        gcom.interceptMessages(shouldIntercept);
     }
 
     @Override
-    public void debugReleaseIntercepted(){
-
+    public void debugReleaseAllIntercepted() throws RemoteException{
+        gcom.releaseAllIntercepted();
     }
 
     @Override
-    public String debugGetVectorClocks(){
-        return "";
+    public  void debugReleaseOldestIntercepted() throws RemoteException{
+        gcom.releaseOldestIntercepted();
+    }
+
+    @Override
+    public void debugReleaseNewestIntercepted() throws RemoteException{
+        gcom.releaseNewestIntercepted();
+    }
+
+    @Override
+    public String debugGetVectorClocks() throws RemoteException{
+        return gcom.getVectorClocks();
+    }
+
+    @Override
+    public String debugGetUndeliveredMessages() throws RemoteException{
+        return gcom.getUndeliveredMessages();
     }
 }
