@@ -2,12 +2,17 @@ package se.cs.umu.test;
 
 
 
+import se.cs.umu.ClientCommunication.ClientCommunication;
 import se.cs.umu.ClientCommunication.ClientCommunicationInterface;
+import se.cs.umu.ClientCommunication.ClientCommunicationObserver;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class comtester {
@@ -15,6 +20,13 @@ public class comtester {
         ClientCommunicationInterface clientCom = (ClientCommunicationInterface) Naming.lookup("rmi://localhost/ClientCom");
 
         Scanner scanner = new Scanner(System.in);
+
+        ClientCommunicationObserver client = new testClient();
+
+        Registry clientRegistry = LocateRegistry.createRegistry(1103);
+        Naming.rebind("//0.0.0.0/testClient", client);
+
+        clientCom.addObserver();
 
         String input = scanner.nextLine();
         while (!input.equals("e")){
@@ -45,7 +57,5 @@ public class comtester {
 
             input = scanner.nextLine();
         }
-
-
     }
 }

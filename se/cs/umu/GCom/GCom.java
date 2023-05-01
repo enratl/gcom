@@ -95,9 +95,9 @@ public class GCom {
     }
 
     public void deliverMessage(String message, String groupName, String sender, int clientClock){
-        // deliver to client
         System.out.println("GCom delivered [message: " + message + ", groupName: " + groupName + ", sender: " + sender
                 + ", clientClock: " + clientClock + "]");
+        clientCommunication.deliverMessage(message);
     }
 
     public HashMap<String, Integer> getVectorClock(String groupName){
