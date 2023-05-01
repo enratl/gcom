@@ -2,34 +2,24 @@ package se.cs.umu.test;
 
 import se.cs.umu.App.Debugger;
 import se.cs.umu.App.DebuggerController;
+import se.cs.umu.ClientCommunication.ClientCommunication;
+import se.cs.umu.ClientCommunication.ClientCommunicationObserver;
 import se.cs.umu.Communication.NodeCommunicationInterface;
 
 import javax.swing.*;
+import java.io.Serializable;
 import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class testClient {
-    public static void main(String[] args) {
-        Debugger debugger = new Debugger();
-        debugger.buildGUI();
-        DebuggerController debuggerController = new DebuggerController(debugger);
+public class testClient extends UnicastRemoteObject implements ClientCommunicationObserver {
+    public testClient() throws RemoteException {
+        super();
+    }
 
-        debugger.displayGUI();
-
-        try {
-
-            //GroupMapInterface groupMap = (GroupMapInterface) Naming.lookup("rmi://localhost/GroupMap");
-
-            //ArrayList<String> list = groupMap.hello();
-            //System.out.println(list);
-
-            //communicator.send(communicators, "Ding dong");
-            //String response = communicator.receive();
-            //System.out.println("Received message: " + response);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+    @Override
+    public void update(String message) throws RemoteException{
+        System.out.println("Client received message: " + message + "\n");
     }
 }
