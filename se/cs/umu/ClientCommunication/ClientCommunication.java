@@ -67,9 +67,6 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     }
 
     @Override
-    public void debugInterceptDelivery(boolean intercept) throws RemoteException {
-
-    @Override
     public void debugReleaseAllIntercepted() throws RemoteException{
         gcom.releaseAllIntercepted();
     }
@@ -98,9 +95,7 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     public void addObserver() throws RemoteException {
         try {
             observer = (ClientCommunicationObserver) Naming.lookup("rmi://localhost/testClient");
-        } catch (NotBoundException e) {
-            throw new RuntimeException(e);
-        } catch (MalformedURLException e) {
+        } catch (NotBoundException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }
