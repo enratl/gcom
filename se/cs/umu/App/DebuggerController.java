@@ -1,43 +1,154 @@
 package se.cs.umu.App;
 
+import se.cs.umu.ClientCommunication.ClientCommunicationInterface;
+import se.cs.umu.ClientCommunication.ClientCommunicationObserver;
 import se.cs.umu.Communication.NodeCommunication;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
-public class DebuggerController {
+public class DebuggerController extends UnicastRemoteObject implements ClientCommunicationObserver {
 
+    ArrayList<String> memberOf;
     Debugger debugger;
-    NodeCommunication nodeCommunication;
-    public DebuggerController(Debugger debugger) {
-        try {
-            nodeCommunication = new NodeCommunication(null);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+
+    GroupMemberList groupMemberList;
+
+    ClientCommunicationInterface clientCom;
+    public DebuggerController(Debugger debugger) throws MalformedURLException, NotBoundException, RemoteException {
 
         this.debugger = debugger;
 
+        memberOf = new ArrayList<>();
+
+        clientCom = (ClientCommunicationInterface) Naming.lookup("rmi://localhost/ClientCom");
+        Registry clientRegistry = LocateRegistry.createRegistry(1103);
+        Naming.rebind("//0.0.0.0/testClient", this);
+
+        clientCom.addObserver();
+
+        populateGroupList(clientCom.listGroups());
+
         debugger.addSendListener(new SendListener());
+        debugger.addCreateGroupListener(new CreateGroupListener());
+        debugger.addJoinListener(new JoinGroupListener());
+        debugger.addSelectGroupListener(new SelectGroupListener());
     }
 
-    public void displayMessage(String message) {
+    @Override
+    public void update(String message) throws RemoteException {
+        System.out.println("here");
         debugger.displayMessage(message);
+    }
+
+    private void populateGroupList(ArrayList<String> groups) {
+        for (String group : groups) {
+            debugger.addGroup(group);
+        }
     }
 
     class SendListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            ArrayList<String> group = new ArrayList<>();
-            group.add("localhost/Communication");
+            ArrayList<String> groups = new ArrayList<>();
+            groups.add("localhost/Communication");
 
             String message = debugger.getMessage();
+            String group = debugger.getJoinedGroup();
 
-            //nodeCommunication.sendToNodes(message, group);
-            System.out.println("Sent message: " + message);
+            if (!group.isEmpty()) {
+                try {
+                    clientCom.sendMessageToGroup(message, group);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+                System.out.println("Sent message: " + message);
+            }
+        }
+    }
+
+    class CreateGroupListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String group = debugger.getGroupName();
+
+            //Create the group in clientCommunication
+
+            if(!group.isEmpty()) {
+                try {
+                    clientCom.createGroup(group);
+                    debugger.addGroup(group);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+    }
+
+    class JoinGroupListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String group = debugger.getSelectedGroup();
+
+            //Join group through clientCommunication
+            if (group != null) {
+                try {
+                    clientCom.joinGroup(group);
+                    debugger.joinGroup(group);
+                    debugger.displayMessage("Joined group: " + group);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+    }
+
+    class SelectGroupListener implements MouseListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                String selectedGroup = debugger.getSelectedGroup();
+
+                groupMemberList = new GroupMemberList();
+
+                try {
+                    ArrayList<String> group = clientCom.getGroupMembers(selectedGroup);
+
+                    for (String member : group ) {
+                        groupMemberList.showMember(member);
+                        groupMemberList.displayList();
+                    }
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+
+                //Display group members
+            }
+        }
+        @Override
+        public void mousePressed(MouseEvent e) {
+        }
+        @Override
+        public void mouseReleased(MouseEvent e) {
+        }
+        @Override
+        public void mouseEntered(MouseEvent e) {
+        }
+        @Override
+        public void mouseExited(MouseEvent e) {
         }
     }
 }
