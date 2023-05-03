@@ -34,7 +34,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
 
         clientCom = (ClientCommunicationInterface) Naming.lookup("rmi://localhost/ClientCom");
         Registry clientRegistry = LocateRegistry.createRegistry(1103);
-        Naming.rebind("//0.0.0.0/testClient", this);
+        Naming.rebind("//0.0.0.0/Client", this);
 
         clientCom.addObserver();
 
@@ -47,9 +47,9 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
     }
 
     @Override
-    public void update(String message) throws RemoteException {
+    public void update(String message, String groupName, String sender, int clientClock) throws RemoteException {
         System.out.println("here");
-        debugger.displayMessage(message);
+        debugger.displayMessage(sender + ": " + message);
     }
 
     private void populateGroupList(ArrayList<String> groups) {
