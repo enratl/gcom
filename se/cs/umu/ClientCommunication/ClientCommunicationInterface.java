@@ -18,6 +18,6 @@ public interface ClientCommunicationInterface extends Remote {
     void debugReleaseNewestIntercepted() throws RemoteException;
     String debugGetVectorClocks() throws RemoteException;
     String debugGetUndeliveredMessages() throws RemoteException;
-    void deliverMessage(String message) throws RemoteException;
+    void deliverMessage(String message, String groupName, String sender, int clientClock) throws RemoteException;
     void addObserver() throws RemoteException;
 }
