@@ -5,10 +5,7 @@ import se.cs.umu.ClientCommunication.ClientCommunicationObserver;
 import se.cs.umu.Communication.NodeCommunication;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -44,6 +41,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         debugger.addCreateGroupListener(new CreateGroupListener());
         debugger.addJoinListener(new JoinGroupListener());
         debugger.addSelectGroupListener(new SelectGroupListener());
+        debugger.addInterceptListener(new InterceptListener());
     }
 
     @Override
@@ -67,7 +65,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
             String message = debugger.getMessage();
             String group = debugger.getJoinedGroup();
 
-            if (!group.isEmpty()) {
+            if (group != null && !group.isEmpty()) {
                 try {
                     clientCom.sendMessageToGroup(message, group);
                 } catch (RemoteException ex) {
@@ -149,6 +147,24 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         }
         @Override
         public void mouseExited(MouseEvent e) {
+        }
+    }
+
+    class InterceptListener implements ItemListener {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            try {
+                if (debugger.interceptIsChecked()) {
+                    clientCom.debugInterceptMessages(true);
+                    debugger.displayMessage("Intercepting messages");
+                }
+                else {
+                    clientCom.debugInterceptMessages(false);
+                    debugger.displayMessage("Stopped intercepting messages");
+                }
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

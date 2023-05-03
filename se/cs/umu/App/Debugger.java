@@ -4,6 +4,7 @@ import se.cs.umu.Communication.NodeCommunicationInterface;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
@@ -18,6 +19,7 @@ public class Debugger {
     private JButton button2;
     private JButton button3;
     private JList list2;
+    private JCheckBox checkBox1;
     private JFrame frame;
 
     DefaultListModel lm1 = new DefaultListModel();
@@ -68,12 +70,20 @@ public class Debugger {
         list1.addMouseListener(mouseListener);
     }
 
+    public void addInterceptListener(ItemListener itemListener) {
+        checkBox1.addItemListener(itemListener);
+    }
+
     public String getSelectedGroup() {
         return (String) list1.getSelectedValue();
     }
 
     public String getJoinedGroup() {
         return (String) list2.getSelectedValue();
+    }
+
+    public boolean interceptIsChecked() {
+        return checkBox1.isSelected();
     }
 
     public void addGroup(String name) {
