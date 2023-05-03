@@ -40,8 +40,8 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     }
 
     @Override
-    public boolean createGroup(String groupName) throws RemoteException {
-        return gcom.createGroup(groupName);
+    public boolean createGroup(String groupName, String ordering) throws RemoteException {
+        return gcom.createGroup(groupName, ordering);
     }
 
     @Override
