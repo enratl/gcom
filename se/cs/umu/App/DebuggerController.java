@@ -48,9 +48,13 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
     }
 
     @Override
-    public void update(String message, String groupName, String sender, int clientClock) throws RemoteException {
-        System.out.println("here");
+    public void displayMessage(String message, String groupName, String sender, int clientClock) throws RemoteException {
         debugger.displayMessage(sender + ": " + message);
+    }
+
+    @Override
+    public void displayOrderingBuffer(String bufferContents) {
+        debugger.displayBuffer(bufferContents);
     }
 
     private void populateGroupList(ArrayList<String> groups) {
@@ -204,6 +208,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                debugger.displayBuffer(clientCom.debugGetUndeliveredMessages());
                 clientCom.debugReleaseAllIntercepted();
             } catch (RemoteException ex) {
                 throw new RuntimeException(ex);

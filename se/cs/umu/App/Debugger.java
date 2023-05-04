@@ -23,6 +23,7 @@ public class Debugger {
     private JButton releaseNewestButton;
     private JButton releaseOldestButton;
     private JButton releaseAllButton;
+    private JTextArea textArea2;
     private JFrame frame;
 
     DefaultListModel lm1 = new DefaultListModel();
@@ -36,6 +37,11 @@ public class Debugger {
 
     public void displayMessage(String message) {
         textArea1.append(message + "\n");
+    }
+
+    public void displayBuffer(String bufferContents) {
+        textArea2.setText("");
+        textArea2.append(bufferContents);
     }
 
     public void buildGUI() {

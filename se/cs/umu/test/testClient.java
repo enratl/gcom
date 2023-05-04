@@ -19,7 +19,12 @@ public class testClient extends UnicastRemoteObject implements ClientCommunicati
     }
 
     @Override
-    public void update(String message, String groupName, String sender, int clientClock) throws RemoteException{
+    public void displayMessage(String message, String groupName, String sender, int clientClock) throws RemoteException{
         System.out.println("Client received message: " + message + "\n");
+    }
+
+    @Override
+    public void displayOrderingBuffer(String bufferContents) throws RemoteException {
+
     }
 }
