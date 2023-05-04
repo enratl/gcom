@@ -11,11 +11,14 @@ public interface GroupMapInterface extends Remote {
 
     void addAddress(String memberName, String adr) throws RemoteException;
 
-    boolean createGroup(String groupName) throws RemoteException;
+    boolean createGroup(String groupName, String ordering) throws RemoteException;
 
     boolean userExists(String userName) throws RemoteException;
 
     void removeFromGroup(String groupName, String userName) throws RemoteException;
+
+    String getGroupOrderingType(String groupName) throws RemoteException;
+    ArrayList<String> getGroupAvailableOrderingTypes() throws RemoteException;
 
     ArrayList<String> getGroups() throws RemoteException;
 }

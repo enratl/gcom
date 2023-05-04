@@ -34,7 +34,10 @@ public class comtester {
             switch (input) {
                 case "createGroup" -> {
                     System.out.print("Group name: ");
-                    clientCom.createGroup(scanner.nextLine());
+                    String groupName = scanner.nextLine();
+                    System.out.print("Ordering type: ");
+                    String ordering = scanner.nextLine();
+                    clientCom.createGroup(groupName, ordering);
                 }
                 case "joinGroup" -> {
                     System.out.print("Group name: ");

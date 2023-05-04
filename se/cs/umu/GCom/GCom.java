@@ -4,6 +4,7 @@ import se.cs.umu.ClientCommunication.ClientCommunication;
 import se.cs.umu.Communication.NodeCommunication;
 import se.cs.umu.MessageOrdering.CausalOrdering;
 import se.cs.umu.MessageOrdering.MessageOrdering;
+import se.cs.umu.MessageOrdering.UnorderedOrdering;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -50,14 +51,24 @@ public class GCom {
 
     public boolean joinGroup(String groupName) {
         if (messageOrderings.containsKey(groupName)) {
+            // we are already a member of the group.
             return true;
         }
 
         try {
-            ArrayList<String> group = groupManagement.getGroupMembers(groupName);
-            HashMap<String, Integer> vectorClock = nodeCommunication.initializeVectorClock(groupName, group);
-            messageOrderings.put(groupName, new CausalOrdering(vectorClock, groupName, this));
-            System.out.println(vectorClock);
+            String orderingType = groupManagement.getGroupOrderingType(groupName);
+
+            switch (orderingType){
+                case "CAUSAL" -> {
+                    ArrayList<String> group = groupManagement.getGroupMembers(groupName);
+                    HashMap<String, Integer> vectorClock = nodeCommunication.initializeVectorClock(groupName, group);
+                    messageOrderings.put(groupName, new CausalOrdering(vectorClock, groupName, this));
+                }
+                case "FIFO" -> {
+                    messageOrderings.put(groupName, new UnorderedOrdering(groupName, this));
+                }
+            }
+
             return groupManagement.joinGroup(groupName, username, InetAddress.getLocalHost().getHostAddress());
         } catch (UnknownHostException e) {
             return false;
@@ -68,8 +79,8 @@ public class GCom {
         return groupManagement.leaveGroup(groupName, username);
     }
 
-    public boolean createGroup(String groupName) {
-        return groupManagement.createGroup(groupName);
+    public boolean createGroup(String groupName, String ordering) {
+        return groupManagement.createGroup(groupName, ordering);
     }
 
     public ArrayList<String> getGroupMembers(String groupName) {
@@ -87,7 +98,7 @@ public class GCom {
 
         ArrayList<String> group = groupManagement.getGroupMembers(groupName);
         HashMap<String, Integer> vectorClock = messageOrderings.get(groupName).getVectorClock();
-        vectorClock.put(username, vectorClock.get(username) + 1);
+        vectorClock.replace(username, vectorClock.getOrDefault(username, 0) + 1);
         nodeCommunication.sendToNodes(message, groupName, group, vectorClock);
         return true;
     }

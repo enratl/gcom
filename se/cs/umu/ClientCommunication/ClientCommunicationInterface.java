@@ -10,7 +10,7 @@ public interface ClientCommunicationInterface extends Remote {
     ArrayList<String> getGroupMembers(String groupName) throws RemoteException;
     boolean joinGroup(String groupName) throws RemoteException;
     boolean leaveGroup(String groupName) throws RemoteException;
-    boolean createGroup(String groupName) throws RemoteException;
+    boolean createGroup(String groupName, String ordering) throws RemoteException;
     boolean sendMessageToGroup(String message, String groupName) throws RemoteException;
     void debugInterceptMessages(boolean intercept) throws RemoteException;
     void debugReleaseAllIntercepted() throws RemoteException;

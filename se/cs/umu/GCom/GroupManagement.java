@@ -49,9 +49,9 @@ public class GroupManagement {
         }
     }
 
-    public boolean createGroup(String groupName){
+    public boolean createGroup(String groupName, String orderingType){
         try{
-            groupMap.createGroup(groupName);
+            groupMap.createGroup(groupName, orderingType);
             return true;
         } catch (RemoteException e) {
             return false;
@@ -64,6 +64,22 @@ public class GroupManagement {
             return true;
         } catch (RemoteException e) {
             return false;
+        }
+    }
+
+    public String getGroupOrderingType(String groupName){
+        try {
+            return groupMap.getGroupOrderingType(groupName);
+        } catch (RemoteException e) {
+            return "error" + e.getMessage();
+        }
+    }
+
+    public ArrayList<String> getGroupAvailableOrderingTypes() {
+        try {
+            return groupMap.getGroupAvailableOrderingTypes();
+        } catch (RemoteException e) {
+            return null;
         }
     }
 }
