@@ -13,6 +13,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 
 public class DebuggerController extends UnicastRemoteObject implements ClientCommunicationObserver {
 
@@ -44,6 +45,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         debuggerGUI.addReleaseNewestListener(new ReleaseNewestListener());
         debuggerGUI.addReleaseOldestListener(new ReleaseOldestListener());
         debuggerGUI.addReleaseAllListener(new ReleaseAllListener());
+        debuggerGUI.addLeaveListener(new LeaveGroupListener());
     }
 
     @Override
@@ -96,7 +98,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
 
             if(!group.isEmpty()) {
                 try {
-                    clientCom.createGroup(group);
+                    clientCom.createGroup(group, "CAUSAL");
                     debuggerGUI.addGroup(group);
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
@@ -119,6 +121,29 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
                 }
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Please select a group to join");
+            }
+        }
+    }
+
+    class LeaveGroupListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String group = debuggerGUI.getJoinedGroup();
+
+            if (group != null) {
+                try {
+                    clientCom.leaveGroup(group);
+                    debuggerGUI.leaveGroup(group);
+                    debuggerGUI.displayMessage("Left group: " + group);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Please select a group to leave");
             }
         }
     }

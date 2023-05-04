@@ -24,6 +24,7 @@ public class DebuggerGUI {
     private JButton releaseOldestButton;
     private JButton releaseAllButton;
     private JTextArea textArea2;
+    private JButton button4;
     private JFrame frame;
 
     DefaultListModel lm1 = new DefaultListModel();
@@ -75,6 +76,10 @@ public class DebuggerGUI {
         button3.addActionListener(actionListener);
     }
 
+    public void addLeaveListener(ActionListener actionListener) {
+        button4.addActionListener(actionListener);
+    }
+
     public void addSelectGroupListener(MouseListener mouseListener) {
         list1.addMouseListener(mouseListener);
     }
@@ -112,8 +117,18 @@ public class DebuggerGUI {
         lm1.addElement(name);
     }
 
+    public void removeGroup(String name) {
+        list1.setModel(lm1);
+        lm1.removeElement(name);
+    }
+
     public void joinGroup(String name) {
         list2.setModel(lm2);
         lm2.addElement(name);
+    }
+
+    public void leaveGroup(String name) {
+        list2.setModel(lm2);
+        lm2.removeElement(name);
     }
 }
