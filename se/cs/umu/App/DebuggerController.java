@@ -42,6 +42,9 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         debugger.addJoinListener(new JoinGroupListener());
         debugger.addSelectGroupListener(new SelectGroupListener());
         debugger.addInterceptListener(new InterceptListener());
+        debugger.addReleaseNewestListener(new ReleaseNewestListener());
+        debugger.addReleaseOldestListener(new ReleaseOldestListener());
+        debugger.addReleaseAllListener(new ReleaseAllListener());
     }
 
     @Override
@@ -65,13 +68,18 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
             String message = debugger.getMessage();
             String group = debugger.getJoinedGroup();
 
-            if (group != null && !group.isEmpty()) {
-                try {
-                    clientCom.sendMessageToGroup(message, group);
-                } catch (RemoteException ex) {
-                    throw new RuntimeException(ex);
+            if (group == null) {
+                JOptionPane.showMessageDialog(null, "Please select a group to send to.");
+            }
+            else {
+                if (!group.isEmpty()) {
+                    try {
+                        clientCom.sendMessageToGroup(message, group);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    System.out.println("Sent message: " + message);
                 }
-                System.out.println("Sent message: " + message);
             }
         }
     }
@@ -164,6 +172,41 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
                 }
             } catch (RemoteException ex) {
                 ex.printStackTrace();
+            }
+        }
+    }
+
+    class ReleaseNewestListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                clientCom.debugReleaseNewestIntercepted();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    class ReleaseOldestListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                clientCom.debugReleaseOldestIntercepted();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    class ReleaseAllListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                clientCom.debugReleaseAllIntercepted();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
             }
         }
     }

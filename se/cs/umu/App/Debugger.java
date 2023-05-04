@@ -20,6 +20,9 @@ public class Debugger {
     private JButton button3;
     private JList list2;
     private JCheckBox checkBox1;
+    private JButton releaseNewestButton;
+    private JButton releaseOldestButton;
+    private JButton releaseAllButton;
     private JFrame frame;
 
     DefaultListModel lm1 = new DefaultListModel();
@@ -72,6 +75,18 @@ public class Debugger {
 
     public void addInterceptListener(ItemListener itemListener) {
         checkBox1.addItemListener(itemListener);
+    }
+
+    public void addReleaseNewestListener(ActionListener actionListener) {
+        releaseNewestButton.addActionListener(actionListener);
+    }
+
+    public void addReleaseOldestListener(ActionListener actionListener) {
+        releaseOldestButton.addActionListener(actionListener);
+    }
+
+    public void addReleaseAllListener(ActionListener actionListener) {
+        releaseAllButton.addActionListener(actionListener);
     }
 
     public String getSelectedGroup() {
