@@ -8,7 +8,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-public class Debugger {
+public class DebuggerGUI {
     private JButton button1;
     private JPanel panel;
     private JTextArea textArea1;
@@ -32,7 +32,7 @@ public class Debugger {
 
     private static ArrayList<NodeCommunicationInterface> communicators;
 
-    public Debugger() {
+    public DebuggerGUI() {
     }
 
     public void displayMessage(String message) {

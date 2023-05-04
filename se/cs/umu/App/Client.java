@@ -1,18 +1,14 @@
 package se.cs.umu.App;
 
-import java.net.MalformedURLException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-
 public class Client {
     public static void main(String[] args) {
         try {
-            Debugger debugger = new Debugger();
+            DebuggerGUI debuggerGUI = new DebuggerGUI();
 
-            DebuggerController controller = new DebuggerController(debugger);
+            DebuggerController controller = new DebuggerController(debuggerGUI);
 
-            debugger.buildGUI();
-            debugger.displayGUI();
+            debuggerGUI.buildGUI();
+            debuggerGUI.displayGUI();
 
         } catch (Exception e) {
             e.printStackTrace();
