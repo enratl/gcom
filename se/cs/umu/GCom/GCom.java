@@ -229,4 +229,12 @@ public class GCom {
     public void removeFromGroup(String groupName, String member) {
         groupManagement.removeFromLocalGroup(groupName, member);
     }
+
+    public String getSendStatistics(){
+        return debugger.getSendStatistics();
+    }
+
+    public void addSendStatistics(String receiver, boolean wasReceived){
+        debugger.addSendStatistics(receiver, wasReceived);
+    }
 }

@@ -44,8 +44,10 @@ public class NodeCommunication extends UnicastRemoteObject implements NodeCommun
             try {
                 NodeCommunicationInterface node = (NodeCommunicationInterface) Naming.lookup("rmi://" + member);
                 node.receiveFromNode(groupName, gcom.getUsername(), message, vectorClock);
-            } catch (RemoteException | NotBoundException | MalformedURLException ignore) {
+                gcom.addSendStatistics(member.split("/")[1], true);
+            } catch (RemoteException | NotBoundException | MalformedURLException e) {
                 // Message was not received
+                gcom.addSendStatistics(member.split("/")[1], false);
             }
         }
     }

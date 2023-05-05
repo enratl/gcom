@@ -53,10 +53,11 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     }
 
     @Override
-    public void debugInterceptMessages(boolean shouldIntercept) throws RemoteException{
+    public void debugInterceptMessages(boolean shouldIntercept) throws RemoteException {
         gcom.interceptMessages(shouldIntercept);
     }
-    public void deliverMessage (String message, String groupName, String sender, int clientClock) {
+
+    public void deliverMessage(String message, String groupName, String sender, int clientClock) {
         try {
             observer.displayMessage(message, groupName, sender, clientClock);
         } catch (RemoteException e) {
@@ -73,28 +74,32 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     }
 
     @Override
-    public void debugReleaseAllIntercepted() throws RemoteException{
+    public void debugReleaseAllIntercepted() throws RemoteException {
         gcom.releaseAllIntercepted();
     }
 
     @Override
-    public  void debugReleaseOldestIntercepted() throws RemoteException{
+    public void debugReleaseOldestIntercepted() throws RemoteException {
         gcom.releaseOldestIntercepted();
     }
 
     @Override
-    public void debugReleaseNewestIntercepted() throws RemoteException{
+    public void debugReleaseNewestIntercepted() throws RemoteException {
         gcom.releaseNewestIntercepted();
     }
 
     @Override
-    public String debugGetVectorClocks() throws RemoteException{
+    public String debugGetVectorClocks() throws RemoteException {
         return gcom.getVectorClocks();
     }
 
     @Override
-    public String debugGetUndeliveredMessages() throws RemoteException{
+    public String debugGetUndeliveredMessages() throws RemoteException {
         return gcom.getUndeliveredMessages();
+    }
+
+    public String debugGetMessageStatistics() throws RemoteException {
+        return gcom.getSendStatistics();
     }
 
     @Override
