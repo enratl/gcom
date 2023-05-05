@@ -43,6 +43,7 @@ public class CausalOrdering implements MessageOrdering {
                     break;
                 }
                 buffer.add(e);
+                gcom.getOrderingBufferContents(getBufferedMessages());
             }
 
             // Check if delivering this message made it possible to deliver any message in the buffer
@@ -52,6 +53,7 @@ public class CausalOrdering implements MessageOrdering {
         } else {
             System.out.println("message wasn't ready to deliver, sending to buffer");
             buffer.add(new BufferEntry(sender, message, messageVectorClock));
+            gcom.getOrderingBufferContents(getBufferedMessages());
             return false;
         }
     }

@@ -167,6 +167,10 @@ public class GCom {
         clientCommunication.deliverMessage(message, groupName, sender, clientClock);
     }
 
+    public void getOrderingBufferContents(String bufferContents) {
+        clientCommunication.getOrderingBufferContents(bufferContents);
+    }
+
     public HashMap<String, Integer> getVectorClock(String groupName) {
         return messageOrderings.get(groupName).getVectorClock();
     }

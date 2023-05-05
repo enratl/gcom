@@ -2,13 +2,9 @@ package se.cs.umu.App;
 
 import se.cs.umu.ClientCommunication.ClientCommunicationInterface;
 import se.cs.umu.ClientCommunication.ClientCommunicationObserver;
-import se.cs.umu.Communication.NodeCommunication;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -17,18 +13,19 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 
 public class DebuggerController extends UnicastRemoteObject implements ClientCommunicationObserver {
 
     ArrayList<String> memberOf;
-    Debugger debugger;
+    DebuggerGUI debuggerGUI;
 
     GroupMemberList groupMemberList;
 
     ClientCommunicationInterface clientCom;
-    public DebuggerController(Debugger debugger) throws MalformedURLException, NotBoundException, RemoteException {
+    public DebuggerController(DebuggerGUI debuggerGUI) throws MalformedURLException, NotBoundException, RemoteException {
 
-        this.debugger = debugger;
+        this.debuggerGUI = debuggerGUI;
 
         memberOf = new ArrayList<>();
 
@@ -40,21 +37,30 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
 
         populateGroupList(clientCom.listGroups());
 
-        debugger.addSendListener(new SendListener());
-        debugger.addCreateGroupListener(new CreateGroupListener());
-        debugger.addJoinListener(new JoinGroupListener());
-        debugger.addSelectGroupListener(new SelectGroupListener());
+        debuggerGUI.addSendListener(new SendListener());
+        debuggerGUI.addCreateGroupListener(new CreateGroupListener());
+        debuggerGUI.addJoinListener(new JoinGroupListener());
+        debuggerGUI.addSelectGroupListener(new SelectGroupListener());
+        debuggerGUI.addInterceptListener(new InterceptListener());
+        debuggerGUI.addReleaseNewestListener(new ReleaseNewestListener());
+        debuggerGUI.addReleaseOldestListener(new ReleaseOldestListener());
+        debuggerGUI.addReleaseAllListener(new ReleaseAllListener());
+        debuggerGUI.addLeaveListener(new LeaveGroupListener());
     }
 
     @Override
-    public void update(String message, String groupName, String sender, int clientClock) throws RemoteException {
-        System.out.println("here");
-        debugger.displayMessage(sender + ": " + message);
+    public void displayMessage(String message, String groupName, String sender, int clientClock) throws RemoteException {
+        debuggerGUI.displayMessage(sender + ": " + message);
+    }
+
+    @Override
+    public void displayOrderingBuffer(String bufferContents) {
+        debuggerGUI.displayBuffer(bufferContents);
     }
 
     private void populateGroupList(ArrayList<String> groups) {
         for (String group : groups) {
-            debugger.addGroup(group);
+            debuggerGUI.addGroup(group);
         }
     }
 
@@ -64,16 +70,21 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
             ArrayList<String> groups = new ArrayList<>();
             groups.add("localhost/Communication");
 
-            String message = debugger.getMessage();
-            String group = debugger.getJoinedGroup();
+            String message = debuggerGUI.getMessage();
+            String group = debuggerGUI.getJoinedGroup();
 
-            if (!group.isEmpty()) {
-                try {
-                    clientCom.sendMessageToGroup(message, group);
-                } catch (RemoteException ex) {
-                    throw new RuntimeException(ex);
+            if (group == null) {
+                JOptionPane.showMessageDialog(null, "Please select a group to send to.");
+            }
+            else {
+                if (!group.isEmpty()) {
+                    try {
+                        clientCom.sendMessageToGroup(message, group);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    System.out.println("Sent message: " + message);
                 }
-                System.out.println("Sent message: " + message);
             }
         }
     }
@@ -81,15 +92,14 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
     class CreateGroupListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String group = debugger.getGroupName();
-            String ordering = "CAUSAL"; // or FIFO
+            String group = debuggerGUI.getGroupName();
 
             //Create the group in clientCommunication
 
             if(!group.isEmpty()) {
                 try {
-                    clientCom.createGroup(group, ordering);
-                    debugger.addGroup(group);
+                    clientCom.createGroup(group, "CAUSAL");
+                    debuggerGUI.addGroup(group);
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -100,17 +110,40 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
     class JoinGroupListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String group = debugger.getSelectedGroup();
+            String group = debuggerGUI.getSelectedGroup();
 
             //Join group through clientCommunication
             if (group != null) {
                 try {
                     clientCom.joinGroup(group);
-                    debugger.joinGroup(group);
-                    debugger.displayMessage("Joined group: " + group);
+                    debuggerGUI.joinGroup(group);
+                    debuggerGUI.displayMessage("Joined group: " + group);
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
                 }
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Please select a group to join");
+            }
+        }
+    }
+
+    class LeaveGroupListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String group = debuggerGUI.getJoinedGroup();
+
+            if (group != null) {
+                try {
+                    clientCom.leaveGroup(group);
+                    debuggerGUI.leaveGroup(group);
+                    debuggerGUI.displayMessage("Left group: " + group);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Please select a group to leave");
             }
         }
     }
@@ -120,7 +153,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getClickCount() == 2) {
-                String selectedGroup = debugger.getSelectedGroup();
+                String selectedGroup = debuggerGUI.getSelectedGroup();
 
                 groupMemberList = new GroupMemberList();
 
@@ -150,6 +183,60 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         }
         @Override
         public void mouseExited(MouseEvent e) {
+        }
+    }
+
+    class InterceptListener implements ItemListener {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            try {
+                if (debuggerGUI.interceptIsChecked()) {
+                    clientCom.debugInterceptMessages(true);
+                    debuggerGUI.displayMessage("Intercepting messages");
+                }
+                else {
+                    clientCom.debugInterceptMessages(false);
+                    debuggerGUI.displayMessage("Stopped intercepting messages");
+                }
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    class ReleaseNewestListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                clientCom.debugReleaseNewestIntercepted();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    class ReleaseOldestListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                clientCom.debugReleaseOldestIntercepted();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    class ReleaseAllListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                debuggerGUI.displayBuffer(clientCom.debugGetUndeliveredMessages());
+                clientCom.debugReleaseAllIntercepted();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }

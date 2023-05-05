@@ -4,10 +4,11 @@ import se.cs.umu.Communication.NodeCommunicationInterface;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-public class Debugger {
+public class DebuggerGUI {
     private JButton button1;
     private JPanel panel;
     private JTextArea textArea1;
@@ -18,6 +19,12 @@ public class Debugger {
     private JButton button2;
     private JButton button3;
     private JList list2;
+    private JCheckBox checkBox1;
+    private JButton releaseNewestButton;
+    private JButton releaseOldestButton;
+    private JButton releaseAllButton;
+    private JTextArea textArea2;
+    private JButton button4;
     private JFrame frame;
 
     DefaultListModel lm1 = new DefaultListModel();
@@ -26,11 +33,16 @@ public class Debugger {
 
     private static ArrayList<NodeCommunicationInterface> communicators;
 
-    public Debugger() {
+    public DebuggerGUI() {
     }
 
     public void displayMessage(String message) {
         textArea1.append(message + "\n");
+    }
+
+    public void displayBuffer(String bufferContents) {
+        textArea2.setText("");
+        textArea2.append(bufferContents);
     }
 
     public void buildGUI() {
@@ -64,8 +76,28 @@ public class Debugger {
         button3.addActionListener(actionListener);
     }
 
+    public void addLeaveListener(ActionListener actionListener) {
+        button4.addActionListener(actionListener);
+    }
+
     public void addSelectGroupListener(MouseListener mouseListener) {
         list1.addMouseListener(mouseListener);
+    }
+
+    public void addInterceptListener(ItemListener itemListener) {
+        checkBox1.addItemListener(itemListener);
+    }
+
+    public void addReleaseNewestListener(ActionListener actionListener) {
+        releaseNewestButton.addActionListener(actionListener);
+    }
+
+    public void addReleaseOldestListener(ActionListener actionListener) {
+        releaseOldestButton.addActionListener(actionListener);
+    }
+
+    public void addReleaseAllListener(ActionListener actionListener) {
+        releaseAllButton.addActionListener(actionListener);
     }
 
     public String getSelectedGroup() {
@@ -76,13 +108,27 @@ public class Debugger {
         return (String) list2.getSelectedValue();
     }
 
+    public boolean interceptIsChecked() {
+        return checkBox1.isSelected();
+    }
+
     public void addGroup(String name) {
         list1.setModel(lm1);
         lm1.addElement(name);
     }
 
+    public void removeGroup(String name) {
+        list1.setModel(lm1);
+        lm1.removeElement(name);
+    }
+
     public void joinGroup(String name) {
         list2.setModel(lm2);
         lm2.addElement(name);
+    }
+
+    public void leaveGroup(String name) {
+        list2.setModel(lm2);
+        lm2.removeElement(name);
     }
 }

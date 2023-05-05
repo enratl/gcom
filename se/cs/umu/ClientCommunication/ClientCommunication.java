@@ -58,7 +58,15 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     }
     public void deliverMessage (String message, String groupName, String sender, int clientClock) {
         try {
-            observer.update(message, groupName, sender, clientClock);
+            observer.displayMessage(message, groupName, sender, clientClock);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void getOrderingBufferContents(String bufferContents) {
+        try {
+            observer.displayOrderingBuffer(bufferContents);
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
