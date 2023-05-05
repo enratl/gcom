@@ -3,7 +3,9 @@ package se.cs.umu.Communication;
 import se.cs.umu.App.DebuggerController;
 import se.cs.umu.GCom.GCom;
 
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -14,8 +16,6 @@ import java.util.HashMap;
 public class NodeCommunication extends UnicastRemoteObject implements NodeCommunicationInterface {
 
     private final GCom gcom;
-
-
     private DebuggerController controller;
 
     public NodeCommunication(GCom gcom) throws RemoteException {
@@ -34,8 +34,7 @@ public class NodeCommunication extends UnicastRemoteObject implements NodeCommun
 
     @Override
     public HashMap<String, Integer> getVectorClock(String groupName) throws RemoteException {
-        System.out.println("Getting vector clock");
-        HashMap<String,Integer> vc = gcom.getVectorClock(groupName);
+        HashMap<String, Integer> vc = gcom.getVectorClock(groupName);
         System.out.println(vc);
         return vc;
     }
@@ -49,7 +48,6 @@ public class NodeCommunication extends UnicastRemoteObject implements NodeCommun
                 // Message was not received
             }
         }
-        System.out.printf("Sent message: " + message + "\n");
     }
 
 
@@ -58,14 +56,15 @@ public class NodeCommunication extends UnicastRemoteObject implements NodeCommun
 
         for (String member : group) {
             try {
-                if (member.split("/")[1].equals(gcom.getUsername())){
+                // ignore ourselves if we are already a member
+                if (member.split("/")[1].equals(gcom.getUsername())) {
                     continue;
                 }
 
                 NodeCommunicationInterface node = (NodeCommunicationInterface) Naming.lookup("rmi://" + member);
                 HashMap<String, Integer> memberVC = node.getVectorClock(groupName);
 
-                if (memberVC == null){
+                if (memberVC == null) {
                     continue;
                 }
 
@@ -88,5 +87,43 @@ public class NodeCommunication extends UnicastRemoteObject implements NodeCommun
 
         System.out.println("vectorClock initialized: " + vectorClock);
         return vectorClock;
+    }
+
+    public void addToGroup(String groupName, String memberName, String adr) throws RemoteException {
+        gcom.addToGroup(groupName, adr + '/' + memberName);
+    }
+
+    public void removeFromGroup(String groupName, String memberName, String adr) throws RemoteException {
+        gcom.removeFromGroup(groupName, adr + '/' + memberName);
+    }
+
+    public boolean joinGroup(ArrayList<String> group, String groupName) {
+
+        for (String member : group) {
+            try {
+                NodeCommunicationInterface node = (NodeCommunicationInterface) Naming.lookup("rmi://" + member);
+                node.addToGroup(groupName, gcom.getUsername(), gcom.getAddress());
+
+                // Add this member to our group.
+                gcom.addToGroup(groupName, member);
+
+            } catch (MalformedURLException | NotBoundException | RemoteException ignore) {
+                // we were not added this nodes local group
+            }
+        }
+
+        return true;
+    }
+
+    public void leaveGroup(ArrayList<String> group, String groupName) {
+        for (String member : group) {
+            try {
+                NodeCommunicationInterface node = (NodeCommunicationInterface) Naming.lookup("rmi://" + member);
+                node.removeFromGroup(groupName, gcom.getUsername(), gcom.getAddress());
+
+            } catch (MalformedURLException | NotBoundException | RemoteException ignore) {
+                // we were not able to leave this nodes local group
+            }
+        }
     }
 }

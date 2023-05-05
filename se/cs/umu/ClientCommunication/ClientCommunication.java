@@ -7,8 +7,6 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
@@ -46,7 +44,7 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
 
     @Override
     public ArrayList<String> getGroupMembers(String groupName) throws RemoteException {
-        return gcom.getGroupMembers(groupName);
+        return gcom.getGlobalGroupMembers(groupName);
     }
 
     @Override

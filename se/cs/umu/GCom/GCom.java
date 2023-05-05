@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GCom {
 
     private final String username;
+    private final String address;
     private final GroupManagement groupManagement;
     private final ClientCommunication clientCommunication;
     private final NodeCommunication nodeCommunication;
@@ -32,11 +33,10 @@ public class GCom {
         this.username = username;
 
         groupManagement = new GroupManagement(groupMapAddress);
-        groupManagement.updateAddress(username, InetAddress.getLocalHost().getHostAddress());
         clientCommunication = new ClientCommunication(this);
         nodeCommunication = new NodeCommunication(this);
         messageOrderings = new ConcurrentHashMap<>();
-
+        address = InetAddress.getLocalHost().getHostAddress();
 
         Registry clientComRegistry = LocateRegistry.createRegistry(1100);
         Naming.rebind("//0.0.0.0/ClientCom", clientCommunication);
@@ -49,46 +49,94 @@ public class GCom {
         return groupManagement.listGroups();
     }
 
+    public boolean explicitJoin(String groupName, ArrayList<String> group, String orderingType) {
+        if (messageOrderings.containsKey(groupName)) {
+            // we are already a member of the group.
+            return true;
+        }
+
+        switch (orderingType) {
+            case "CAUSAL" -> {
+                HashMap<String, Integer> vectorClock = nodeCommunication.initializeVectorClock(groupName, group);
+                messageOrderings.put(groupName, new CausalOrdering(vectorClock, groupName, this));
+            }
+            case "FIFO" -> {
+                messageOrderings.put(groupName, new UnorderedOrdering(groupName, this));
+            }
+            default -> {
+                // unsupported orderingType
+                return false;
+            }
+        }
+
+        groupManagement.createLocalGroup(groupName);
+        nodeCommunication.joinGroup(group, groupName);
+
+        return true;
+    }
+
     public boolean joinGroup(String groupName) {
         if (messageOrderings.containsKey(groupName)) {
             // we are already a member of the group.
             return true;
         }
 
-        try {
-            String orderingType = groupManagement.getGroupOrderingType(groupName);
+        String orderingType = groupManagement.getGroupOrderingType(groupName);
 
-            switch (orderingType){
-                case "CAUSAL" -> {
-                    ArrayList<String> group = groupManagement.getGroupMembers(groupName);
-                    HashMap<String, Integer> vectorClock = nodeCommunication.initializeVectorClock(groupName, group);
-                    messageOrderings.put(groupName, new CausalOrdering(vectorClock, groupName, this));
-                }
-                case "FIFO" -> {
-                    messageOrderings.put(groupName, new UnorderedOrdering(groupName, this));
-                }
+        switch (orderingType) {
+            case "CAUSAL" -> {
+                ArrayList<String> group = groupManagement.getGlobalGroupMembers(groupName);
+                HashMap<String, Integer> vectorClock = nodeCommunication.initializeVectorClock(groupName, group);
+                messageOrderings.put(groupName, new CausalOrdering(vectorClock, groupName, this));
             }
+            case "FIFO" -> {
+                messageOrderings.put(groupName, new UnorderedOrdering(groupName, this));
+            }
+            default -> {
+                // groupMap might be down, explicit join could be needed
+                return false;
+            }
+        }
 
-            return groupManagement.joinGroup(groupName, username, InetAddress.getLocalHost().getHostAddress());
-        } catch (UnknownHostException e) {
+
+        if (!groupManagement.addToGlobalGroupList(groupName, username, address)) {
+            // Unable to add to global group list. (Might be down, explicit join could be needed)
             return false;
         }
+
+        groupManagement.createLocalGroup(groupName);
+        nodeCommunication.joinGroup(groupManagement.getGlobalGroupMembers(groupName), groupName);
+
+        return true;
     }
 
     public boolean leaveGroup(String groupName) {
-        return groupManagement.leaveGroup(groupName, username);
+        if (!messageOrderings.containsKey(groupName)) {
+            // we are not a member of the group.
+            return true;
+        }
+
+        messageOrderings.remove(groupName);
+        nodeCommunication.leaveGroup(groupManagement.getGlobalGroupMembers(groupName), groupName);
+        groupManagement.removeLocalGroup(groupName);
+        return groupManagement.leaveGroup(groupName, address + '/' + username);
     }
 
     public boolean createGroup(String groupName, String ordering) {
         return groupManagement.createGroup(groupName, ordering);
     }
 
-    public ArrayList<String> getGroupMembers(String groupName) {
-        return groupManagement.getGroupMembers(groupName);
+    public ArrayList<String> getGlobalGroupMembers(String groupName) {
+        System.out.println(groupManagement.getLocalGroupMembers(groupName));
+        return groupManagement.getGlobalGroupMembers(groupName);
     }
 
     public String getUsername() {
         return username;
+    }
+
+    public String getAddress() {
+        return address;
     }
 
     public boolean sendMessageToGroup(String message, String groupName) {
@@ -96,7 +144,7 @@ public class GCom {
             return false;
         }
 
-        ArrayList<String> group = groupManagement.getGroupMembers(groupName);
+        ArrayList<String> group = groupManagement.getLocalGroupMembers(groupName);
         HashMap<String, Integer> vectorClock = messageOrderings.get(groupName).getVectorClock();
         vectorClock.replace(username, vectorClock.getOrDefault(username, 0) + 1);
         nodeCommunication.sendToNodes(message, groupName, group, vectorClock);
@@ -113,7 +161,7 @@ public class GCom {
         }
     }
 
-    public void deliverMessage(String message, String groupName, String sender, int clientClock){
+    public void deliverMessage(String message, String groupName, String sender, int clientClock) {
         System.out.println("GCom delivered [message: " + message + ", groupName: " + groupName + ", sender: " + sender
                 + ", clientClock: " + clientClock + "]");
         clientCommunication.deliverMessage(message, groupName, sender, clientClock);
@@ -163,10 +211,18 @@ public class GCom {
     public String getVectorClocks() {
         StringBuilder sb = new StringBuilder();
 
-        for (String group : messageOrderings.keySet()){
+        for (String group : messageOrderings.keySet()) {
             sb.append(group).append(" ").append(messageOrderings.get(group).getVectorClock());
         }
 
         return sb.toString();
+    }
+
+    public void addToGroup(String groupName, String member) {
+        groupManagement.addToLocalGroup(groupName, member);
+    }
+
+    public void removeFromGroup(String groupName, String member) {
+        groupManagement.removeFromLocalGroup(groupName, member);
     }
 }

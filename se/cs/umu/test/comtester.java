@@ -24,9 +24,8 @@ public class comtester {
         ClientCommunicationObserver client = new testClient();
 
         Registry clientRegistry = LocateRegistry.createRegistry(1103);
-        Naming.rebind("//0.0.0.0/testClient", client);
-
-        clientCom.addObserver();
+        //Naming.rebind("//0.0.0.0/testClient", client);
+        //clientCom.addObserver();
 
         String input = scanner.nextLine();
         while (!input.equals("e")){
@@ -75,6 +74,11 @@ public class comtester {
                 case "releaseOldestIntercepted" -> {
                     clientCom.debugReleaseNewestIntercepted();
                     System.out.println("Oldest intercepted message released");
+                }
+                case "leaveGroup" -> {
+                    System.out.print("Group name: ");
+                    String groupName = scanner.nextLine();
+                    clientCom.leaveGroup(groupName);
                 }
             }
 
