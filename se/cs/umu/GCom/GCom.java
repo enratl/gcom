@@ -126,6 +126,22 @@ public class GCom {
         return groupManagement.createGroup(groupName, ordering);
     }
 
+    public boolean deleteGroup(String groupName) {
+        ArrayList<String> group = getGlobalGroupMembers(groupName);
+
+        if (groupManagement.deleteGroup(groupName)) {
+            return false;
+        }
+
+        nodeCommunication.deleteGroupForMembers(group, groupName);
+        return true;
+    }
+
+    public void deleteLocalGroupInfo(String groupName) {
+        messageOrderings.remove(groupName);
+        groupManagement.removeLocalGroup(groupName);
+    }
+
     public ArrayList<String> getGlobalGroupMembers(String groupName) {
         System.out.println(groupManagement.getLocalGroupMembers(groupName));
         return groupManagement.getGlobalGroupMembers(groupName);
@@ -248,11 +264,11 @@ public class GCom {
         groupManagement.removeFromLocalGroup(groupName, member);
     }
 
-    public String getSendStatistics(){
+    public String getSendStatistics() {
         return debugger.getSendStatistics();
     }
 
-    public void addSendStatistics(String receiver, boolean wasReceived){
+    public void addSendStatistics(String receiver, boolean wasReceived) {
         debugger.addSendStatistics(receiver, wasReceived);
     }
 }

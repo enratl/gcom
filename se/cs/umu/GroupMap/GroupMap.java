@@ -43,6 +43,9 @@ public class GroupMap extends UnicastRemoteObject implements GroupMapInterface {
         return true;
     }
 
+    public void deleteGroup(String groupName) throws RemoteException {
+        groups.remove(groupName);
+    }
 
     @Override
     public void removeFromGroup(String groupName, String member) throws RemoteException {

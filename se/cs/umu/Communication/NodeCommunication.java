@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -127,5 +128,20 @@ public class NodeCommunication extends UnicastRemoteObject implements NodeCommun
                 // we were not able to leave this nodes local group
             }
         }
+    }
+
+    public void deleteGroupForMembers(ArrayList<String> group, String groupName) {
+        for (String member : group){
+            try {
+                NodeCommunicationInterface node = (NodeCommunicationInterface) Naming.lookup("rmi://" + member);
+                node.deleteGroup(groupName);
+            } catch (NotBoundException | MalformedURLException | RemoteException e) {
+                // local group info wasn't deleted for member
+            }
+        }
+    }
+
+    public void deleteGroup(String groupName) throws RemoteException {
+        gcom.deleteLocalGroupInfo(groupName);
     }
 }

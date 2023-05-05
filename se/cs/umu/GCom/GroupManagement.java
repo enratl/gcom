@@ -80,6 +80,15 @@ public class GroupManagement {
         }
     }
 
+    public boolean deleteGroup(String groupName){
+        try {
+            groupMap.deleteGroup(groupName);
+            return true;
+        } catch (RemoteException e){
+            return false;
+        }
+    }
+
 
     public String getGroupOrderingType(String groupName) {
         try {

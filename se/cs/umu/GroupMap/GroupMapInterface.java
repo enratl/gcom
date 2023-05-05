@@ -13,7 +13,7 @@ public interface GroupMapInterface extends Remote {
 
     boolean createGroup(String groupName, String ordering) throws RemoteException;
 
-
+    void deleteGroup(String groupName) throws RemoteException;
 
     void removeFromGroup(String groupName, String userName) throws RemoteException;
 

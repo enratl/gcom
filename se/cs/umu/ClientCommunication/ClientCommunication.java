@@ -43,6 +43,11 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     }
 
     @Override
+    public boolean deleteGroup(String groupName) throws RemoteException {
+        return gcom.deleteGroup(groupName);
+    }
+
+    @Override
     public ArrayList<String> getGroupMembers(String groupName) throws RemoteException {
         return gcom.getGlobalGroupMembers(groupName);
     }

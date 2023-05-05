@@ -11,6 +11,7 @@ public interface ClientCommunicationInterface extends Remote {
     boolean joinGroup(String groupName) throws RemoteException;
     boolean leaveGroup(String groupName) throws RemoteException;
     boolean createGroup(String groupName, String ordering) throws RemoteException;
+    boolean deleteGroup(String groupName) throws RemoteException;
     boolean sendMessageToGroup(String message, String groupName) throws RemoteException;
     void deliverMessage(String message, String groupName, String sender, int clientClock) throws RemoteException;
     void debugInterceptMessages(boolean intercept) throws RemoteException;

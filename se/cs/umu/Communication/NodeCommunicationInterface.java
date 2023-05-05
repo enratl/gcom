@@ -10,5 +10,5 @@ public interface NodeCommunicationInterface extends Remote {
     HashMap<String, Integer> getVectorClock(String groupName) throws RemoteException;
     void addToGroup (String groupName, String memberName, String adr) throws RemoteException;
     void removeFromGroup(String groupName, String memberName, String adr) throws RemoteException;
-
+    void deleteGroup(String groupName) throws RemoteException;
 }
