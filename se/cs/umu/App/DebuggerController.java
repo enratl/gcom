@@ -45,6 +45,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         debuggerGUI.addReleaseOldestListener(new ReleaseOldestListener());
         debuggerGUI.addReleaseAllListener(new ReleaseAllListener());
         debuggerGUI.addLeaveListener(new LeaveGroupListener());
+        debuggerGUI.addRemoveGroupListener(new RemoveGroupListener());
     }
 
     @Override
@@ -156,6 +157,22 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
             }
             else {
                 JOptionPane.showMessageDialog(null, "Please select a group to leave");
+            }
+        }
+    }
+
+    class RemoveGroupListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String group = debuggerGUI.getSelectedGroup();
+            if (group != null) {
+                try {
+                    clientCom.deleteGroup(group);
+                    debuggerGUI.removeGroup(group);
+                    debuggerGUI.leaveGroup(group);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
     }

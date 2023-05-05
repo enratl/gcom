@@ -28,6 +28,7 @@ public class DebuggerGUI {
     private JRadioButton causalRadioButton;
     private JRadioButton FIFORadioButton;
     private JTextArea textArea3;
+    private JButton button5;
     private ButtonGroup buttonGroup1;
     private JFrame frame;
 
@@ -108,6 +109,10 @@ public class DebuggerGUI {
 
     public void addReleaseAllListener(ActionListener actionListener) {
         releaseAllButton.addActionListener(actionListener);
+    }
+
+    public void addRemoveGroupListener(ActionListener actionListener) {
+        button5.addActionListener(actionListener);
     }
 
     public String getSelectedGroup() {
