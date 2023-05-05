@@ -73,6 +73,14 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
         }
     }
 
+    public void displayDebugBufferContents(String bufferContents) {
+        try {
+            observer.displayDebugBuffer(bufferContents);
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void debugReleaseAllIntercepted() throws RemoteException {
         gcom.releaseAllIntercepted();

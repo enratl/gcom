@@ -36,6 +36,10 @@ public class Debugger {
         return tempIntercepted;
     }
 
+    public ArrayList<DebugBufferEntry> getDebugBuffer() {
+        return new ArrayList<>(intercepted);
+    }
+
     public void setShouldIntercept(boolean shouldIntercept) {
         this.shouldIntercept = shouldIntercept;
     }
