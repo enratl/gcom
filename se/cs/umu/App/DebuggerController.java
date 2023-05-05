@@ -93,13 +93,21 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         @Override
         public void actionPerformed(ActionEvent e) {
             String group = debuggerGUI.getGroupName();
+            String ordering = "";
 
             //Create the group in clientCommunication
 
             if(!group.isEmpty()) {
                 try {
-                    clientCom.createGroup(group, "CAUSAL");
+                    if (debuggerGUI.getSelectedOrdering()) {
+                        ordering = "CAUSAL";
+                    }
+                    else {
+                        ordering = "FIFO";
+                    }
+                    clientCom.createGroup(group, ordering);
                     debuggerGUI.addGroup(group);
+                    //debuggerGUI.displayMessage("Created group " + group + " with ordering " + ordering);
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
                 }

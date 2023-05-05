@@ -25,6 +25,9 @@ public class DebuggerGUI {
     private JButton releaseAllButton;
     private JTextArea textArea2;
     private JButton button4;
+    private JRadioButton causalRadioButton;
+    private JRadioButton FIFORadioButton;
+    private ButtonGroup buttonGroup1;
     private JFrame frame;
 
     DefaultListModel lm1 = new DefaultListModel();
@@ -43,6 +46,7 @@ public class DebuggerGUI {
     public void displayBuffer(String bufferContents) {
         textArea2.setText("");
         textArea2.append(bufferContents);
+
     }
 
     public void buildGUI() {
@@ -110,6 +114,10 @@ public class DebuggerGUI {
 
     public boolean interceptIsChecked() {
         return checkBox1.isSelected();
+    }
+
+    public boolean getSelectedOrdering() {
+        return causalRadioButton.isSelected();
     }
 
     public void addGroup(String name) {
