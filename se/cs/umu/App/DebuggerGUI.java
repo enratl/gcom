@@ -29,6 +29,7 @@ public class DebuggerGUI {
     private JRadioButton FIFORadioButton;
     private JTextArea textArea3;
     private JButton button5;
+    private JTabbedPane tabbedPane1;
     private ButtonGroup buttonGroup1;
     private JFrame frame;
 
@@ -39,6 +40,13 @@ public class DebuggerGUI {
     private static ArrayList<NodeCommunicationInterface> communicators;
 
     public DebuggerGUI() {
+    }
+
+    public void buildGUI() {
+        frame = new JFrame("Debugger");
+        frame.setContentPane(this.panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
     }
 
     public void displayMessage(String message) {
@@ -56,11 +64,8 @@ public class DebuggerGUI {
         textArea3.append(bufferContents);
     }
 
-    public void buildGUI() {
-        frame = new JFrame("Debugger");
-        frame.setContentPane(this.panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
+    public void displayVectorClocks(String clocks) {
+        //Display values
     }
 
     public void displayGUI() {

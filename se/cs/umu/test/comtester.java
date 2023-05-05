@@ -21,7 +21,7 @@ public class comtester {
 
         Scanner scanner = new Scanner(System.in);
 
-        ClientCommunicationObserver client = new testClient();
+        ClientCommunicationObserver client;
 
         Registry clientRegistry = LocateRegistry.createRegistry(1103);
         //Naming.rebind("//0.0.0.0/testClient", client);

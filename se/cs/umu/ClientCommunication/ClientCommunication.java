@@ -19,7 +19,6 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     public ClientCommunication(GCom gcom) throws RemoteException {
         super();
         this.gcom = gcom;
-        observer = new testClient();
     }
 
     @Override

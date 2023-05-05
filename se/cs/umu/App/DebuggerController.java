@@ -36,6 +36,10 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
 
         populateGroupList(clientCom.listGroups());
 
+        setListeners();
+    }
+
+    private void setListeners() {
         debuggerGUI.addSendListener(new SendListener());
         debuggerGUI.addCreateGroupListener(new CreateGroupListener());
         debuggerGUI.addJoinListener(new JoinGroupListener());
@@ -50,7 +54,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
 
     @Override
     public void displayMessage(String message, String groupName, String sender, int clientClock) throws RemoteException {
-        debuggerGUI.displayMessage(sender + ": " + message);
+        debuggerGUI.displayMessage(sender + ": " + message + " " + clientClock);
     }
 
     @Override
@@ -61,6 +65,11 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
     @Override
     public void displayDebugBuffer(String bufferContents) {
         debuggerGUI.displayDebugBuffer(bufferContents);
+    }
+
+    @Override
+    public void displayVectorClocks(String clocks) {
+        debuggerGUI.displayVectorClocks(clocks);
     }
 
     private void populateGroupList(ArrayList<String> groups) {
@@ -173,6 +182,9 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
                 }
+            }
+            else {
+                JOptionPane.showMessageDialog(null, "Please select group to remove");
             }
         }
     }
