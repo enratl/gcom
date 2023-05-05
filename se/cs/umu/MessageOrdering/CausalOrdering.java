@@ -4,7 +4,6 @@ import se.cs.umu.GCom.GCom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 public class CausalOrdering implements MessageOrdering {
     private final ArrayList<BufferEntry> buffer;
@@ -43,7 +42,7 @@ public class CausalOrdering implements MessageOrdering {
                     break;
                 }
                 buffer.add(e);
-                gcom.getOrderingBufferContents(getBufferedMessages());
+                gcom.displayOrderingBufferContents(getBufferedMessages());
             }
 
             // Check if delivering this message made it possible to deliver any message in the buffer
@@ -53,7 +52,7 @@ public class CausalOrdering implements MessageOrdering {
         } else {
             System.out.println("message wasn't ready to deliver, sending to buffer");
             buffer.add(new BufferEntry(sender, message, messageVectorClock));
-            gcom.getOrderingBufferContents(getBufferedMessages());
+            gcom.displayOrderingBufferContents(getBufferedMessages());
             return false;
         }
     }

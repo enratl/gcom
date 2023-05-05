@@ -148,6 +148,7 @@ public class GCom {
         HashMap<String, Integer> vectorClock = messageOrderings.get(groupName).getVectorClock();
         vectorClock.replace(username, vectorClock.getOrDefault(username, 0) + 1);
         nodeCommunication.sendToNodes(message, groupName, group, vectorClock);
+        displayDebugBufferContents();
         return true;
     }
 
@@ -167,7 +168,7 @@ public class GCom {
         clientCommunication.deliverMessage(message, groupName, sender, clientClock);
     }
 
-    public void getOrderingBufferContents(String bufferContents) {
+    public void displayOrderingBufferContents(String bufferContents) {
         clientCommunication.getOrderingBufferContents(bufferContents);
     }
 
@@ -183,6 +184,8 @@ public class GCom {
         for (DebugBufferEntry e : debugger.releaseAllIntercepted()) {
             messageOrderings.get(e.groupName()).receiveMessage(e.sender(), e.message(), e.messageVectorClock());
         }
+
+        displayDebugBufferContents();
     }
 
     public void releaseOldestIntercepted() {
@@ -191,6 +194,7 @@ public class GCom {
         if (e != null) {
             messageOrderings.get(e.groupName()).receiveMessage(e.sender(), e.message(), e.messageVectorClock());
         }
+        displayDebugBufferContents();
     }
 
     public void releaseNewestIntercepted() {
@@ -199,6 +203,7 @@ public class GCom {
         if (e != null) {
             messageOrderings.get(e.groupName()).receiveMessage(e.sender(), e.message(), e.messageVectorClock());
         }
+        displayDebugBufferContents();
     }
 
     public String getUndeliveredMessages() {
@@ -210,6 +215,19 @@ public class GCom {
         }
 
         return sb.toString();
+    }
+
+    public void displayDebugBufferContents() {
+        StringBuilder sb = new StringBuilder();
+
+        for (DebugBufferEntry entry : debugger.getDebugBuffer()) {
+            sb.append("{[" + entry.groupName() + "],["
+                    + entry.sender() + "],["
+                    + entry.message() + "],["
+                    + entry.messageVectorClock().toString() + "]}\n");
+        }
+
+        clientCommunication.displayDebugBufferContents(sb.toString());
     }
 
     public String getVectorClocks() {

@@ -13,7 +13,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 
 public class DebuggerController extends UnicastRemoteObject implements ClientCommunicationObserver {
 
@@ -55,7 +54,12 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
 
     @Override
     public void displayOrderingBuffer(String bufferContents) {
-        debuggerGUI.displayBuffer(bufferContents);
+        debuggerGUI.displayOrderingBuffer(bufferContents);
+    }
+
+    @Override
+    public void displayDebugBuffer(String bufferContents) {
+        debuggerGUI.displayDebugBuffer(bufferContents);
     }
 
     private void populateGroupList(ArrayList<String> groups) {
@@ -240,7 +244,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                debuggerGUI.displayBuffer(clientCom.debugGetUndeliveredMessages());
+                debuggerGUI.displayOrderingBuffer(clientCom.debugGetUndeliveredMessages());
                 clientCom.debugReleaseAllIntercepted();
             } catch (RemoteException ex) {
                 throw new RuntimeException(ex);

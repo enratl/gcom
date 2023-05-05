@@ -19,4 +19,9 @@ public class testClient extends UnicastRemoteObject implements ClientCommunicati
     public void displayOrderingBuffer(String bufferContents) throws RemoteException {
 
     }
+
+    @Override
+    public void displayDebugBuffer(String bufferContents) throws RemoteException {
+
+    }
 }

@@ -27,6 +27,7 @@ public class DebuggerGUI {
     private JButton button4;
     private JRadioButton causalRadioButton;
     private JRadioButton FIFORadioButton;
+    private JTextArea textArea3;
     private ButtonGroup buttonGroup1;
     private JFrame frame;
 
@@ -43,10 +44,15 @@ public class DebuggerGUI {
         textArea1.append(message + "\n");
     }
 
-    public void displayBuffer(String bufferContents) {
+    public void displayOrderingBuffer(String bufferContents) {
         textArea2.setText("");
         textArea2.append(bufferContents);
 
+    }
+
+    public void displayDebugBuffer(String bufferContents) {
+        textArea3.setText("");
+        textArea3.append(bufferContents);
     }
 
     public void buildGUI() {
