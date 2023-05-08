@@ -94,6 +94,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
                 if (!group.isEmpty()) {
                     try {
                         clientCom.sendMessageToGroup(message, group);
+                        debuggerGUI.displayVectorClocks(clientCom.debugGetVectorClocks());
                     } catch (RemoteException ex) {
                         throw new RuntimeException(ex);
                     }

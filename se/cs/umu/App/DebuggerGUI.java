@@ -30,6 +30,7 @@ public class DebuggerGUI {
     private JTextArea textArea3;
     private JButton button5;
     private JTabbedPane tabbedPane1;
+    private JTextArea textArea4;
     private ButtonGroup buttonGroup1;
     private JFrame frame;
 
@@ -65,7 +66,8 @@ public class DebuggerGUI {
     }
 
     public void displayVectorClocks(String clocks) {
-        //Display values
+        textArea4.setText("");
+        textArea4.append(clocks);
     }
 
     public void displayGUI() {
