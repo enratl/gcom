@@ -31,6 +31,7 @@ public class DebuggerGUI {
     private JButton button5;
     private JTabbedPane tabbedPane1;
     private JTextArea textArea4;
+    private JButton refreshButton;
     private ButtonGroup buttonGroup1;
     private JFrame frame;
 
@@ -68,6 +69,18 @@ public class DebuggerGUI {
     public void displayVectorClocks(String clocks) {
         textArea4.setText("");
         textArea4.append(clocks);
+    }
+
+    public void updateAvailableGroups(ArrayList<String> groups) {
+        list1.setModel(lm1);
+        lm1.clear();
+        lm1.addAll(groups);
+    }
+
+    public void updateJoinedGroups(ArrayList<String> groups) {
+        list2.setModel(lm2);
+        lm2.clear();
+        lm2.addAll(groups);
     }
 
     public void displayGUI() {
@@ -120,6 +133,10 @@ public class DebuggerGUI {
 
     public void addRemoveGroupListener(ActionListener actionListener) {
         button5.addActionListener(actionListener);
+    }
+
+    public void addRefreshListener(ActionListener actionListener) {
+        refreshButton.addActionListener(actionListener);
     }
 
     public String getSelectedGroup() {

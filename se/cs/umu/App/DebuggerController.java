@@ -50,6 +50,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         debuggerGUI.addReleaseAllListener(new ReleaseAllListener());
         debuggerGUI.addLeaveListener(new LeaveGroupListener());
         debuggerGUI.addRemoveGroupListener(new RemoveGroupListener());
+        debuggerGUI.addRefreshListener(new RefreshListener());
     }
 
     @Override
@@ -141,6 +142,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
                     clientCom.joinGroup(group);
                     debuggerGUI.joinGroup(group);
                     debuggerGUI.displayMessage("Joined group: " + group);
+                    memberOf.add(group);
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -276,6 +278,32 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
             try {
                 debuggerGUI.displayOrderingBuffer(clientCom.debugGetUndeliveredMessages());
                 clientCom.debugReleaseAllIntercepted();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    class RefreshListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ArrayList<String> groups;
+            ArrayList<String> temp = new ArrayList<>();
+
+            try {
+                groups = clientCom.listGroups();
+
+                debuggerGUI.updateAvailableGroups(groups);
+
+                for ( String group : groups ) {
+                    if (memberOf.contains(group)) {
+                        temp.add(group);
+                    }
+                }
+
+                debuggerGUI.updateJoinedGroups(temp);
+                memberOf = temp;
             } catch (RemoteException ex) {
                 throw new RuntimeException(ex);
             }
