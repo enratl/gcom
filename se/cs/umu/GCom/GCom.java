@@ -182,6 +182,7 @@ public class GCom {
         System.out.println("GCom delivered [message: " + message + ", groupName: " + groupName + ", sender: " + sender
                 + ", clientClock: " + clientClock + "]");
         clientCommunication.deliverMessage(message, groupName, sender, clientClock);
+        displayDebugBufferContents();
     }
 
     public void displayOrderingBufferContents(String bufferContents) {
