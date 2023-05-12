@@ -29,7 +29,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         memberOf = new ArrayList<>();
 
         clientCom = (ClientCommunicationInterface) Naming.lookup("rmi://localhost/ClientCom");
-        Registry clientRegistry = LocateRegistry.createRegistry(1103);
+        Registry clientRegistry = LocateRegistry.createRegistry(1104);
         Naming.rebind("//0.0.0.0/Client", this);
 
         clientCom.addObserver();
@@ -56,6 +56,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
     @Override
     public void displayMessage(String message, String groupName, String sender, int clientClock) throws RemoteException {
         debuggerGUI.displayMessage(sender + ": " + message + " " + clientClock);
+        debuggerGUI.displayVectorClocks(clientCom.debugGetVectorClocks());
     }
 
     @Override
@@ -295,6 +296,8 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
                 groups = clientCom.listGroups();
 
                 debuggerGUI.updateAvailableGroups(groups);
+                debuggerGUI.displayOrderingBuffer(clientCom.debugGetUndeliveredMessages());
+                debuggerGUI.displayVectorClocks(clientCom.debugGetVectorClocks());
 
                 for ( String group : groups ) {
                     if (memberOf.contains(group)) {
