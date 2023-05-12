@@ -173,6 +173,7 @@ public class GCom {
 
         if (debugger.shouldIntercept()) {
             debugger.intercept(groupName, sender, message, messageVectorClock);
+            displayDebugBufferContents();
         } else {
             messageOrderings.get(groupName).receiveMessage(sender, message, messageVectorClock);
         }
