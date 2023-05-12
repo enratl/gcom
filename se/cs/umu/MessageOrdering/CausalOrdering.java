@@ -39,14 +39,10 @@ public class CausalOrdering implements MessageOrdering {
             for (int i = buffer.size() - 1; i >= 0; i--) {
                 BufferEntry e = buffer.remove(i);
                 if(receiveMessage(e.sender, e.message, e.messageVectorClock)){
+                    gcom.displayOrderingBufferContents(getBufferedMessages());
                     break;
                 }
-                buffer.add(e);
-                gcom.displayOrderingBufferContents(getBufferedMessages());
             }
-
-            // Check if delivering this message made it possible to deliver any message in the buffer
-            //buffer.removeIf(bufferEntry -> receiveMessage(bufferEntry.sender, bufferEntry.message, bufferEntry.messageVectorClock));
 
             return true;
         } else {
@@ -71,7 +67,7 @@ public class CausalOrdering implements MessageOrdering {
     }
 
     private boolean messageIsReadyToDeliver(String sender, HashMap<String, Integer> messageVectorClock) {
-        if (sender.equals(gcom.getUsername()) && messageVectorClock.get(sender).equals(vectorClock.get(sender))) {
+        if (sender.equals(gcom.getUsername())) {
             // this is our own message
             return true;
         }
