@@ -41,7 +41,7 @@ public class ClientGUI {
     }
 
     public void buildGUI() {
-        frame = new JFrame("Debugger");
+        frame = new JFrame("GCom Chat");
         frame.setContentPane(this.panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
