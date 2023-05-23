@@ -111,6 +111,7 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     }
 
     public String debugGetMessageStatistics() throws RemoteException {
+        observer.displaySendStatistics(gcom.getSendStatistics());
         return gcom.getSendStatistics();
     }
 

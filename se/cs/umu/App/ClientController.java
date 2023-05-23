@@ -74,6 +74,10 @@ public class ClientController extends UnicastRemoteObject implements ClientCommu
     public void displayVectorClocks(String clock) throws RemoteException {
     }
 
+    @Override
+    public void displaySendStatistics(String statistics) throws RemoteException {
+    }
+
     class SendListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {

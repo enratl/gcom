@@ -273,4 +273,12 @@ public class GCom {
     public void addSendStatistics(String receiver, boolean wasReceived) {
         debugger.addSendStatistics(receiver, wasReceived);
     }
+
+    public void displaySendStatistics() {
+        try {
+            clientCommunication.debugGetMessageStatistics();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

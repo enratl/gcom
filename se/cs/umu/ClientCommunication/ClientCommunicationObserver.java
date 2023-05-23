@@ -11,4 +11,6 @@ public interface ClientCommunicationObserver extends Remote{
     void displayDebugBuffer(String bufferContents) throws RemoteException;
 
     void displayVectorClocks(String clock) throws RemoteException;
+
+    void displaySendStatistics(String statistics) throws RemoteException;
 }

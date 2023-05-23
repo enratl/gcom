@@ -49,6 +49,7 @@ public class NodeCommunication extends UnicastRemoteObject implements NodeCommun
             } catch (RemoteException | NotBoundException | MalformedURLException e) {
                 // Message was not received
                 gcom.addSendStatistics(member.split("/")[1], false);
+                gcom.displaySendStatistics();
             }
         }
     }

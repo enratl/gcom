@@ -74,6 +74,11 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         debuggerGUI.displayVectorClocks(clocks);
     }
 
+    @Override
+    public void displaySendStatistics(String statistics) {
+        debuggerGUI.displayMessage(statistics);
+    }
+
     private void populateGroupList(ArrayList<String> groups) {
         for (String group : groups) {
             debuggerGUI.addGroup(group);
