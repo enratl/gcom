@@ -27,12 +27,12 @@ public class ClientController extends UnicastRemoteObject implements ClientCommu
 
     ClientCommunicationInterface clientCom;
 
-    protected ClientController(ClientGUI gui) throws RemoteException, MalformedURLException, NotBoundException {
+    protected ClientController(ClientGUI gui, int port) throws RemoteException, MalformedURLException, NotBoundException {
         this.gui = gui;
         memberOf = new ArrayList<>();
 
         clientCom = (ClientCommunicationInterface) Naming.lookup("rmi://localhost/ClientCom");
-        Registry clientRegistry = LocateRegistry.createRegistry(1103);
+        Registry clientRegistry = LocateRegistry.createRegistry(port);
         Naming.rebind("//0.0.0.0/Client", this);
 
         clientCom.addObserver();

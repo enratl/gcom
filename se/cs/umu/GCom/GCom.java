@@ -28,7 +28,7 @@ public class GCom {
     private final ConcurrentHashMap<String, MessageOrdering> messageOrderings;
     private final Debugger debugger;
 
-    public GCom(String username, String groupMapAddress) throws RemoteException, MalformedURLException, NotBoundException, UnknownHostException {
+    public GCom(String username, String groupMapAddress, int port) throws RemoteException, MalformedURLException, NotBoundException, UnknownHostException {
         debugger = new Debugger();
         this.username = username;
 
@@ -38,10 +38,10 @@ public class GCom {
         messageOrderings = new ConcurrentHashMap<>();
         address = InetAddress.getLocalHost().getHostAddress();
 
-        Registry clientComRegistry = LocateRegistry.createRegistry(1100);
+        Registry clientComRegistry = LocateRegistry.createRegistry(port);
         Naming.rebind("//0.0.0.0/ClientCom", clientCommunication);
 
-        Registry nodeComRegistry = LocateRegistry.createRegistry(1101);
+        Registry nodeComRegistry = LocateRegistry.createRegistry(port+1);
         Naming.rebind("//0.0.0.0/" + username, nodeCommunication);
     }
 
@@ -252,7 +252,7 @@ public class GCom {
         StringBuilder sb = new StringBuilder();
 
         for (String group : messageOrderings.keySet()) {
-            sb.append(group).append(" ").append(messageOrderings.get(group).getVectorClock());
+            sb.append(group).append(" ").append(messageOrderings.get(group).getVectorClock()).append("\n");
         }
 
         return sb.toString();

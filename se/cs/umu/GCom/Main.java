@@ -10,10 +10,16 @@ public class Main {
         if (args.length < 2){
             System.out.println("GCom needs to be initialized with: 1. username, 2. GroupManagement ip address");
         }
+        else {
+            String username = args[0];
+            String groupMapAddress = args[1];
 
-        String username = args[0];
-        String groupMapAddress = args[1];
-
-        GCom GCom = new GCom(username, groupMapAddress);
+            if(args.length > 2) {
+                GCom GCom = new GCom(username, groupMapAddress, Integer.parseInt(args[2]));
+            }
+            else {
+                GCom GCom = new GCom(username, groupMapAddress, 1100);
+            }
+        }
     }
 }

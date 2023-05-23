@@ -22,14 +22,14 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
     GroupMemberList groupMemberList;
 
     ClientCommunicationInterface clientCom;
-    public DebuggerController(DebuggerGUI debuggerGUI) throws MalformedURLException, NotBoundException, RemoteException {
+    public DebuggerController(DebuggerGUI debuggerGUI, int port) throws MalformedURLException, NotBoundException, RemoteException {
 
         this.debuggerGUI = debuggerGUI;
 
         memberOf = new ArrayList<>();
 
         clientCom = (ClientCommunicationInterface) Naming.lookup("rmi://localhost/ClientCom");
-        Registry clientRegistry = LocateRegistry.createRegistry(1104);
+        Registry clientRegistry = LocateRegistry.createRegistry(port);
         Naming.rebind("//0.0.0.0/Client", this);
 
         clientCom.addObserver();
