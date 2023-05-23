@@ -207,8 +207,8 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
 
                     for (String member : group ) {
                         groupMemberList.showMember(member);
-                        groupMemberList.displayList();
                     }
+                    groupMemberList.displayList(selectedGroup);
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
                 }

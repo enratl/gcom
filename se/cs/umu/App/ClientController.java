@@ -217,8 +217,8 @@ public class ClientController extends UnicastRemoteObject implements ClientCommu
 
                     for (String member : group ) {
                         groupMemberList.showMember(member);
-                        groupMemberList.displayList();
                     }
+                    groupMemberList.displayList(selectedGroup);
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
                 }

@@ -14,8 +14,8 @@ public class GroupMemberList {
     public GroupMemberList() {
     }
 
-    public void displayList() {
-        frame = new JFrame("Group");
+    public void displayList(String name) {
+        frame = new JFrame(name);
         frame.setContentPane(this.panel1);
         frame.pack();
         frame.setVisible(true);
