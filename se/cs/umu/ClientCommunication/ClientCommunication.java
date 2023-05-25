@@ -82,7 +82,7 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
         }
     }
 
-    public void displayDebugBufferContents(String bufferContents) {
+    public void displayDebugBufferContents(ArrayList<String> bufferContents) {
         try {
             observer.displayDebugBuffer(bufferContents);
         } catch (RemoteException e) {
@@ -131,6 +131,14 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
         try {
             observer = (ClientCommunicationObserver) Naming.lookup("rmi://localhost/Client");
         } catch (NotBoundException | MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void joinFailed() {
+        try {
+            observer.displayExplicitJoin();
+        } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }

@@ -95,7 +95,7 @@ public class GCom {
             }
             default -> {
                 // groupMap might be down, explicit join could be needed
-                return false;
+                clientCommunication.joinFailed();
             }
         }
 
@@ -239,14 +239,18 @@ public class GCom {
     public void displayDebugBufferContents() {
         StringBuilder sb = new StringBuilder();
 
+        ArrayList<String> bufferContents = new ArrayList<>();
+
         for (DebugBufferEntry entry : debugger.getDebugBuffer()) {
             sb.append("{[" + entry.groupName() + "],["
                     + entry.sender() + "],["
                     + entry.message() + "],["
-                    + entry.messageVectorClock().toString() + "]}\n");
+                    + entry.messageVectorClock().toString() + "]}");
+            bufferContents.add(sb.toString());
+            sb = new StringBuilder();
         }
 
-        clientCommunication.displayDebugBufferContents(sb.toString());
+        clientCommunication.displayDebugBufferContents(bufferContents);
     }
 
     public String getVectorClocks() {
@@ -277,6 +281,7 @@ public class GCom {
 
     public void dropMessage(int index){
         debugger.dropMessage(index);
+        displayDebugBufferContents();
     }
 
     public void displaySendStatistics() {

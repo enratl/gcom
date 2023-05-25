@@ -273,10 +273,11 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="1fb69" class="javax.swing.JTextArea" binding="textArea3" default-binding="true">
+                  <component id="6bf7c" class="javax.swing.JList" binding="debugBuffer">
                     <constraints/>
                     <properties>
                       <background color="-4276546"/>
+                      <foreground color="-16777216"/>
                     </properties>
                   </component>
                 </children>

@@ -32,12 +32,16 @@ public class DebuggerGUI {
     private JTabbedPane tabbedPane1;
     private JTextArea textArea4;
     private JButton refreshButton;
+    private JList debugBuffer;
     private ButtonGroup buttonGroup1;
     private JFrame frame;
 
-    DefaultListModel lm1 = new DefaultListModel();
+    JPopupMenu menu;
+    JMenuItem item;
 
+    DefaultListModel lm1 = new DefaultListModel();
     DefaultListModel lm2 = new DefaultListModel();
+    DefaultListModel lm3 = new DefaultListModel();
 
     private static ArrayList<NodeCommunicationInterface> communicators;
 
@@ -61,9 +65,10 @@ public class DebuggerGUI {
 
     }
 
-    public void displayDebugBuffer(String bufferContents) {
-        textArea3.setText("");
-        textArea3.append(bufferContents);
+    public void displayDebugBuffer(ArrayList<String> bufferContents) {
+        debugBuffer.setModel(lm3);
+        lm3.clear();
+        lm3.addAll(bufferContents);
     }
 
     public void displayVectorClocks(String clocks) {
@@ -93,6 +98,10 @@ public class DebuggerGUI {
 
     public String getGroupName() {
         return textField2.getText();
+    }
+
+    public int getInterceptedMessage() {
+        return debugBuffer.getSelectedIndex();
     }
 
     public void addSendListener(ActionListener actionListener) {
@@ -139,6 +148,13 @@ public class DebuggerGUI {
         refreshButton.addActionListener(actionListener);
     }
 
+    public void addPopupListener(MouseListener mouseListener) {
+        debugBuffer.addMouseListener(mouseListener);
+    }
+
+    public void addDropListener(ActionListener actionListener) {
+        item.addActionListener(actionListener);
+    }
     public String getSelectedGroup() {
         return (String) list1.getSelectedValue();
     }
@@ -173,5 +189,15 @@ public class DebuggerGUI {
     public void leaveGroup(String name) {
         list2.setModel(lm2);
         lm2.removeElement(name);
+    }
+
+    public void showPopup(ActionListener actionListener) {
+        menu = new JPopupMenu();
+        item = new JMenuItem("Drop");
+
+        item.addActionListener(actionListener);
+
+        menu.add(item);
+        menu.show(debugBuffer, 5, debugBuffer.getCellBounds(debugBuffer.getSelectedIndex(), debugBuffer.getSelectedIndex()).y);
     }
 }

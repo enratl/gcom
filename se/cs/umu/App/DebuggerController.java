@@ -5,6 +5,7 @@ import se.cs.umu.ClientCommunication.ClientCommunicationObserver;
 
 import javax.swing.*;
 import java.awt.event.*;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -13,6 +14,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class DebuggerController extends UnicastRemoteObject implements ClientCommunicationObserver {
 
@@ -22,9 +25,13 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
     GroupMemberList groupMemberList;
 
     ClientCommunicationInterface clientCom;
+
+    ExplicitJoin explicitJoin;
     public DebuggerController(DebuggerGUI debuggerGUI, int port) throws MalformedURLException, NotBoundException, RemoteException {
 
         this.debuggerGUI = debuggerGUI;
+
+        explicitJoin = new ExplicitJoin();
 
         memberOf = new ArrayList<>();
 
@@ -51,6 +58,9 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
         debuggerGUI.addLeaveListener(new LeaveGroupListener());
         debuggerGUI.addRemoveGroupListener(new RemoveGroupListener());
         debuggerGUI.addRefreshListener(new RefreshListener());
+        debuggerGUI.addPopupListener(new PopupListener());
+        //debuggerGUI.addDropListener(new DropListener());
+        explicitJoin.addJoinListener(new ExplicitJoinListener());
     }
 
     @Override
@@ -65,7 +75,7 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
     }
 
     @Override
-    public void displayDebugBuffer(String bufferContents) {
+    public void displayDebugBuffer(ArrayList<String> bufferContents) {
         debuggerGUI.displayDebugBuffer(bufferContents);
     }
 
@@ -77,6 +87,11 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
     @Override
     public void displaySendStatistics(String statistics) {
         debuggerGUI.displayMessage(statistics);
+    }
+
+    @Override
+    public void displayExplicitJoin() {
+        explicitJoin.displayExplicitJoin();
     }
 
     private void populateGroupList(ArrayList<String> groups) {
@@ -145,10 +160,11 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
             //Join group through clientCommunication
             if (group != null) {
                 try {
-                    clientCom.joinGroup(group);
-                    debuggerGUI.joinGroup(group);
-                    debuggerGUI.displayMessage("Joined group: " + group);
-                    memberOf.add(group);
+                    if(clientCom.joinGroup(group)) {
+                        debuggerGUI.joinGroup(group);
+                        debuggerGUI.displayMessage("Joined group: " + group);
+                        memberOf.add(group);
+                    }
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -315,6 +331,80 @@ public class DebuggerController extends UnicastRemoteObject implements ClientCom
             } catch (RemoteException ex) {
                 throw new RuntimeException(ex);
             }
+        }
+    }
+
+    class PopupListener implements MouseListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (SwingUtilities.isRightMouseButton(e)) {
+                debuggerGUI.showPopup(new DropListener());
+            }
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
+    }
+
+    class DropListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int messageIndex = debuggerGUI.getInterceptedMessage();
+
+            try {
+                clientCom.debugDropMessage(messageIndex);
+            } catch (RemoteException ex) {
+                JOptionPane.showMessageDialog(null, "Could not drop message");
+            }
+        }
+    }
+
+    class ExplicitJoinListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String ordering;
+            if (explicitJoin.causalSelected()) {
+                ordering = "CAUSAL";
+            }
+            else {
+                ordering = "FIFO";
+            }
+
+            String groupInfo = explicitJoin.getGroupInfo();
+
+            String[] temp = groupInfo.split("\n");
+            ArrayList<String> groupMembers = new ArrayList<>(Arrays.asList(temp).subList(1, temp.length));
+
+            try {
+                if(clientCom.explicitJoin(temp[0], groupMembers, ordering)) {
+                    debuggerGUI.joinGroup(temp[0]);
+                    debuggerGUI.displayMessage("Joined group: " + temp[0]);
+                    memberOf.add(temp[0]);
+                }
+            } catch (RemoteException ex) {
+                System.out.println("too bad");
+            }
+
+            explicitJoin.closeWindow();
         }
     }
 }

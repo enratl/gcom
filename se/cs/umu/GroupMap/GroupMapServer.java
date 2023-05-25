@@ -12,7 +12,7 @@ public class GroupMapServer {
     public static void main(String[] args) {
         try {
             GroupMapInterface groupMap = new GroupMap();
-            Registry registry = LocateRegistry.createRegistry(1099);
+            Registry registry = LocateRegistry.createRegistry(1100);
             Naming.rebind("//0.0.0.0/GroupMap", groupMap);
 
             System.out.println("Group map server running on: " + InetAddress.getLocalHost().getHostAddress());

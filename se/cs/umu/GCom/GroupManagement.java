@@ -33,7 +33,7 @@ public class GroupManagement {
         try {
             return groupMap.getGroupMembers(groupName);
         } catch (RemoteException e) {
-            return null;
+            return getLocalGroupMembers(groupName);
         }
     }
 

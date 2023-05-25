@@ -67,7 +67,7 @@ public class ClientController extends UnicastRemoteObject implements ClientCommu
     }
 
     @Override
-    public void displayDebugBuffer(String bufferContents) throws RemoteException {
+    public void displayDebugBuffer(ArrayList<String> bufferContents) throws RemoteException {
     }
 
     @Override
@@ -76,6 +76,11 @@ public class ClientController extends UnicastRemoteObject implements ClientCommu
 
     @Override
     public void displaySendStatistics(String statistics) throws RemoteException {
+    }
+
+    @Override
+    public void displayExplicitJoin() {
+
     }
 
     class SendListener implements ActionListener {
