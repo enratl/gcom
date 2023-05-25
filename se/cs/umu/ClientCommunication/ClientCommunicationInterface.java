@@ -8,6 +8,7 @@ public interface ClientCommunicationInterface extends Remote {
 
     ArrayList<String> listGroups() throws RemoteException;
     ArrayList<String> getGroupMembers(String groupName) throws RemoteException;
+    boolean explicitJoin(String groupName, ArrayList<String> group, String orderingType) throws RemoteException;;
     boolean joinGroup(String groupName) throws RemoteException;
     boolean leaveGroup(String groupName) throws RemoteException;
     boolean createGroup(String groupName, String ordering) throws RemoteException;
@@ -21,5 +22,6 @@ public interface ClientCommunicationInterface extends Remote {
     String debugGetVectorClocks() throws RemoteException;
     String debugGetUndeliveredMessages() throws RemoteException;
     String debugGetMessageStatistics() throws RemoteException;
+    void debugDropMessage(int index) throws RemoteException;
     void addObserver() throws RemoteException;
 }

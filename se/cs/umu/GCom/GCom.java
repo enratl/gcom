@@ -73,7 +73,6 @@ public class GCom {
 
         groupManagement.createLocalGroup(groupName);
         nodeCommunication.joinGroup(group, groupName);
-
         return true;
     }
 
@@ -274,6 +273,10 @@ public class GCom {
 
     public void addSendStatistics(String receiver, boolean wasReceived) {
         debugger.addSendStatistics(receiver, wasReceived);
+    }
+
+    public void dropMessage(int index){
+        debugger.dropMessage(index);
     }
 
     public void displaySendStatistics() {

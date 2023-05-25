@@ -27,6 +27,11 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
     }
 
     @Override
+    public boolean explicitJoin(String groupName, ArrayList<String> group, String orderingType) throws RemoteException{
+        return gcom.explicitJoin(groupName, group, orderingType);
+    }
+
+    @Override
     public boolean joinGroup(String groupName) throws RemoteException {
         return gcom.joinGroup(groupName);
     }
@@ -110,9 +115,15 @@ public class ClientCommunication extends UnicastRemoteObject implements ClientCo
         return gcom.getUndeliveredMessages();
     }
 
+    @Override
     public String debugGetMessageStatistics() throws RemoteException {
         observer.displaySendStatistics(gcom.getSendStatistics());
         return gcom.getSendStatistics();
+    }
+
+    @Override
+    public void debugDropMessage(int index) throws RemoteException{
+        gcom.dropMessage(index);
     }
 
     @Override

@@ -70,4 +70,17 @@ public class Debugger {
 
         return sb.substring(0, sb.length() - 1);
     }
+
+    public void dropMessage(int index){
+        Stack<DebugBufferEntry> temp = new Stack<>();
+
+        for (int i = 0; i < index; i++) {
+            temp.push(intercepted.removeFirst());
+        }
+        intercepted.removeFirst();
+
+        for (int i = 0; i < index; i++) {
+            intercepted.addFirst(temp.pop());
+        }
+    }
 }
