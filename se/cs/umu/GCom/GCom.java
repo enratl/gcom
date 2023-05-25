@@ -43,6 +43,8 @@ public class GCom {
 
         Registry nodeComRegistry = LocateRegistry.createRegistry(port+1);
         Naming.rebind("//0.0.0.0/" + username, nodeCommunication);
+
+        System.out.println("Connected");
     }
 
     public ArrayList<String> listGroups() {
